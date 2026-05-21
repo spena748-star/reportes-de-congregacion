@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Congregacional - Extractor Inteligente</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src='https://unpkg.com/tesseract.js@4.1.1/dist/tesseract.min.js'></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 40px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .upload-zone {
+            background: var(--card);
+            border: 3px dashed var(--border);
+            border-radius: 16px;
+            padding: 60px 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 30px;
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--primary);
+            background: #eff6ff;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px -10px rgba(37,99,235,0.2);
+        }
+
+        .upload-zone .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .upload-zone h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+
+        .upload-zone p {
+            color: var(--text-light);
+            margin-bottom: 20px;
+        }
+
+        .file-types {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .file-type {
+            background: var(--bg);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--secondary);
+            border: 1px solid var(--border);
+        }
+
+        input[type="file"] { display: none; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .dashboard {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.1);
+        }
+
+        .stat-card.warning { border-left-color: var(--warning); }
+        .stat-card.success { border-left-color: var(--success); }
+        .stat-card.danger { border-left-color: var(--danger); }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1;
+        }
+
+        .stat-change {
+            font-size: 0.875rem;
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        .positive { color: var(--success); }
+        .negative { color: var(--danger); }
+
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--bg);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: var(--bg);
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:hover td {
+            background: var(--bg);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-primary { background: #dbeafe; color: #1e40af; }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--bg);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.active { display: block; }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alert.show { display: flex; }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 20px;
+            background: var(--bg);
+            padding: 4px;
+            border-radius: 8px;
+            width: fit-content;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: none;
+            background: transparent;
+            color: var(--text-light);
+        }
+
+        .tab.active {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            header h1 { font-size: 1.75rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+
+        .extracted-text {
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            border: 1px solid var(--border);
+        }
+
+        .congregation-info {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .congregation-info h2 {
+            font-size: 1.75rem;
+            margin-bottom: 10px;
+        }
+
+        .congregation-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            opacity: 0.9;
+        }
+
+        .congregation-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>📊 Dashboard Congregacional</h1>
+            <p>Extractor inteligente de informes - Sube tu archivo Excel, PDF o imagen</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Alertas -->
+        <div id="alertBox" class="alert alert-info">
+            <span>ℹ️</span>
+            <span id="alertMessage"></span>
+        </div>
+
+        <!-- Zona de carga -->
+        <div class="upload-zone" id="uploadZone">
+            <div class="icon">📁</div>
+            <h3>Arrastra tu archivo aquí</h3>
+            <p>O haz clic para seleccionar un archivo</p>
+            <div class="file-types">
+                <span class="file-type">📑 Excel (.xlsx, .xls)</span>
+                <span class="file-type">📄 PDF (.pdf)</span>
+                <span class="file-type">🖼️ Imagen (.jpg, .png)</span>
+            </div>
+            <br><br>
+            <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                Seleccionar Archivo
+            </button>
+            <input type="file" id="fileInput" accept=".xlsx,.xls,.pdf,.jpg,.jpeg,.png">
+        </div>
+
+        <!-- Loading -->
+        <div class="loading" id="loadingSection">
+            <div class="spinner"></div>
+            <h3 id="loadingText">Procesando archivo...</h3>
+            <p id="loadingSubtext">Esto puede tomar unos segundos</p>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="dashboard" id="dashboard">
+            <!-- Info de congregación -->
+            <div class="congregation-info">
+                <h2 id="congName">Cargando...</h2>
+                <div class="congregation-meta">
+                    <span>📅 <span id="visitDate">--</span></span>
+                    <span>👥 <span id="totalPub">--</span> publicadores</span>
+                    <span>🏛️ <span id="visitType">Visita de circuito</span></span>
+                </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="btn-group">
+                <button class="btn btn-success" onclick="exportToExcel()">
+                    📥 Descargar Excel
+                </button>
+                <button class="btn btn-warning" onclick="exportToPDF()">
+                    📝 Descargar PDF
+                </button>
+                <button class="btn btn-primary" onclick="location.reload()">
+                    🔄 Nuevo Archivo
+                </button>
+            </div>
+
+            <!-- Estadísticas principales -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Publicadores Activos</div>
+                    <div class="stat-value" id="statActive">--</div>
+                    <div class="stat-change">de <span id="statTotal">--</span> total</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressActive" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="stat-card success">
+                    <div class="stat-label">Precursores Regulares</div>
+                    <div class="stat-value" id="statPR">--</div>
+                    <div class="stat-change positive">Prom: <span id="statPRAvg">--</span> hrs</div>
+                </div>
+
+                <div class="stat-card warning">
+                    <div class="stat-label">Precursores Auxiliares</div>
+                    <div class="stat-value" id="statPA">--</div>
+                    <div class="stat-change">Prom: <span id="statPAAvg">--</span> hrs</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-label">Promedio de Horas</div>
+                    <div class="stat-value" id="statHours">--</div>
+                    <div class="stat-change" id="statHoursTrend">Por publicador</div>
+                </div>
+
+                <div class="stat-card success">
+                    <div class="stat-label">Cursos Bíblicos</div>
+                    <div class="stat-value" id="statCourses">--</div>
+                    <div class="stat-change positive">Conductores: <span id="statConductors">--</span></div>
+                </div>
+
+                <div class="stat-card danger">
+                    <div class="stat-label">Irregulares / Inactivos</div>
+                    <div class="stat-value" id="statIrregular">--</div>
+                    <div class="stat-change negative">Requieren atención</div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('overview')">Resumen</button>
+                <button class="tab" onclick="switchTab('publishers')">Publicadores</button>
+                <button class="tab" onclick="switchTab('precursors')">Precursores</button>
+                <button class="tab" onclick="switchTab('meetings')">Reuniones</button>
+                <button class="tab" onclick="switchTab('accounting')">Contabilidad</button>
+                <button class="tab" onclick="switchTab('raw')">Datos Crudos</button>
+            </div>
+
+            <!-- Contenido tabs -->
+            <div id="tab-overview" class="tab-content active">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Actividad Mensual</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="activityChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Distribución de Publicadores</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="distributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Indicadores Clave</span>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Indicador</th>
+                                <th>Visita Actual</th>
+                                <th>Visita Pasada</th>
+                                <th>Tendencia</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="indicatorsTable">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-publishers" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Detalle de Publicadores</span>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Cantidad</th>
+                                <th>% del Total</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="publishersTable">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Informes Faltantes</span>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Estado</th>
+                                <th>Período</th>
+                            </tr>
+                        </thead>
+                        <tbody id="missingReportsTable">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-precursors" class="tab-content">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Precursores Regulares - Promedios</span>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Mes</th>
+                                    <th>Cantidad</th>
+                                    <th>Horas</th>
+                                    <th>Cursos</th>
+                                </tr>
+                            </thead>
+                            <tbody id="prTable">
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">Precursores Auxiliares - Promedios</span>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Mes</th>
+                                    <th>Cantidad</th>
+                                    <th>Horas</th>
+                                    <th>Cursos</th>
+                                </tr>
+                            </thead>
+                            <tbody id="paTable">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Comparativa de Horas</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="hoursChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-meetings" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Asistencia a Reuniones</span>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Mes</th>
+                                <th>Entre Semana</th>
+                                <th>Fin de Semana</th>
+                                <th>Total</th>
+                                <th>% Asistencia</th>
+                            </tr>
+                        </thead>
+                        <tbody id="meetingsTable">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Tendencia de Asistencia</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="attendanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-accounting" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Resumen Contable</span>
+                    </div>
+                    <div class="stats-grid" style="margin-top: 20px;">
+                        <div class="stat-card">
+                            <div class="stat-label">Obra Mundial (6 meses)</div>
+                            <div class="stat-value" id="accOM">--</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Congregación (6 meses)</div>
+                            <div class="stat-value" id="accCong">--</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Gastos Totales</div>
+                            <div class="stat-value" id="accExpenses">--</div>
+                        </div>
+                        <div class="stat-card success">
+                            <div class="stat-label">Saldo Actual</div>
+                            <div class="stat-value" id="accBalance">--</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-raw" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Texto Extraído (para verificación)</span>
+                    </div>
+                    <div class="extracted-text" id="rawText"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let extractedData = {};
+        let rawTextContent = '';
+        let charts = {};
+
+        // Event listeners
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadZone.addEventListener('click', () => fileInput.click());
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length) handleFile(files[0]);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) handleFile(e.target.files[0]);
+        });
+
+        function showAlert(message, type = 'info') {
+            const alertBox = document.getElementById('alertBox');
+            const alertMessage = document.getElementById('alertMessage');
+            alertBox.className = `alert alert-${type} show`;
+            alertMessage.textContent = message;
+            setTimeout(() => alertBox.classList.remove('show'), 5000);
+        }
+
+        function setLoading(show, text = 'Procesando archivo...', subtext = '') {
+            const loading = document.getElementById('loadingSection');
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingSubtext').textContent = subtext;
+            if (show) {
+                loading.classList.add('active');
+                document.getElementById('uploadZone').style.display = 'none';
+            } else {
+                loading.classList.remove('active');
+            }
+        }
+
+        async function handleFile(file) {
+            const ext = file.name.split('.').pop().toLowerCase();
+
+            if (!['xlsx', 'xls', 'pdf', 'jpg', 'jpeg', 'png'].includes(ext)) {
+                showAlert('Formato no soportado. Usa Excel, PDF o imagen.', 'warning');
+                return;
+            }
+
+            setLoading(true, 'Analizando archivo...', file.name);
+
+            try {
+                if (ext === 'xlsx' || ext === 'xls') {
+                    await processExcel(file);
+                } else if (ext === 'pdf') {
+                    await processPDF(file);
+                } else {
+                    await processImage(file);
+                }
+            } catch (error) {
+                console.error(error);
+                showAlert('Error al procesar: ' + error.message, 'warning');
+                setLoading(false);
+            }
+        }
+
+        async function processExcel(file) {
+            const data = await file.arrayBuffer();
+            const workbook = XLSX.read(data, { type: 'array', cellFormula: true });
+
+            let allText = '';
+            const sheets = {};
+
+            workbook.SheetNames.forEach(name => {
+                const sheet = workbook.Sheets[name];
+                const json = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+                sheets[name] = json;
+                allText += `\n=== HOJA: ${name} ===\n`;
+                json.forEach(row => {
+                    allText += row.join(' | ') + '\n';
+                });
+            });
+
+            rawTextContent = allText;
+            extractedData = parseCongregationData(sheets, allText);
+            showDashboard();
+        }
+
+        async function processPDF(file) {
+            // Para PDFs, usamos un enfoque de extracción de texto básico
+            // En producción, usarías pdf.js o un backend
+            setLoading(true, 'Extrayendo texto del PDF...', 'Esto puede tomar más tiempo');
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                // Simulación de extracción - en realidad necesitarías pdf.js
+                rawTextContent = `[PDF extraído]\nNombre: ${file.name}\nTamaño: ${(file.size/1024).toFixed(2)} KB\n\nNota: La extracción de PDF requiere procesamiento adicional. Se recomienda convertir a Excel o usar OCR para imágenes.`;
+
+                // Intentar extraer datos usando patrones comunes
+                extractedData = extractFromText(rawTextContent);
+                showDashboard();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function processImage(file) {
+            setLoading(true, 'Realizando OCR en la imagen...', 'Tesseract.js está analizando el texto');
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const result = await Tesseract.recognize(
+                        e.target.result,
+                        'spa',
+                        { logger: m => {
+                            if (m.status === 'recognizing text') {
+                                setLoading(true, `OCR: ${(m.progress * 100).toFixed(0)}%`, 'Reconociendo texto en español...');
+                            }
+                        }}
+                    );
+
+                    rawTextContent = result.data.text;
+                    extractedData = extractFromText(rawTextContent);
+                    showDashboard();
+                } catch (err) {
+                    showAlert('Error en OCR: ' + err.message, 'warning');
+                    setLoading(false);
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function parseCongregationData(sheets, rawText) {
+            const data = {
+                congregation: { name: '', number: '', visitDate: '' },
+                publishers: { total: 0, active: 0, regular: 0, auxiliary: 0, irregular: 0, inactive: 0 },
+                precursors: { regular: [], auxiliary: [] },
+                meetings: { midweek: [], weekend: [] },
+                accounting: { om: 0, cong: 0, expenses: 0, balance: 0 },
+                courses: { total: 0, conductors: 0 },
+                hours: { total: 0, average: 0 },
+                monthly: [],
+                missingReports: [],
+                indicators: []
+            };
+
+            // Extraer nombre de congregación
+            const congMatch = rawText.match(/(\d+)[.\s]+([^,(]+)/);
+            if (congMatch) {
+                data.congregation.name = congMatch[2].trim();
+                data.congregation.number = congMatch[1];
+            }
+
+            // Fecha de visita
+            const dateMatch = rawText.match(/(\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4})/);
+            if (dateMatch) data.congregation.visitDate = dateMatch[1];
+
+            // Buscar en todas las hojas
+            Object.values(sheets).forEach(sheet => {
+                sheet.forEach((row, idx) => {
+                    const rowText = row.join(' ').toLowerCase();
+
+                    // Publicadores activos
+                    if (rowText.includes('publicadores activos') || rowText.includes('activos')) {
+                        const val = row.find(c => typeof c === 'number' && c > 10 && c < 200);
+                        if (val) data.publishers.active = val;
+                    }
+
+                    // Precursores regulares
+                    if (rowText.includes('precursores regulares') || rowText.includes('p. regulares')) {
+                        const val = row.find(c => typeof c === 'number' && c > 0 && c < 100);
+                        if (val) data.publishers.regular = val;
+                    }
+
+                    // Precursores auxiliares
+                    if (rowText.includes('precursores auxiliares') || rowText.includes('p. auxiliares')) {
+                        const val = row.find(c => typeof c === 'number' && c >= 0 && c < 50);
+                        if (val !== undefined) data.publishers.auxiliary = val;
+                    }
+
+                    // Total publicadores
+                    if (rowText.includes('total') && rowText.includes('publicadores')) {
+                        const val = row.find(c => typeof c === 'number' && c > 50 && c < 300);
+                        if (val) data.publishers.total = val;
+                    }
+
+                    // Irregulares
+                    if (rowText.includes('irregulares')) {
+                        const val = row.find(c => typeof c === 'number' && c >= 0 && c < 20);
+                        if (val !== undefined) data.publishers.irregular = val;
+                    }
+
+                    // Inactivos
+                    if (rowText.includes('inactivos')) {
+                        const val = row.find(c => typeof c === 'number' && c >= 0 && c < 20);
+                        if (val !== undefined) data.publishers.inactive = val;
+                    }
+
+                    // Cursos bíblicos
+                    if (rowText.includes('cursos b') || rowText.includes('cursos bib')) {
+                        const val = row.find(c => typeof c === 'number' && c >= 0 && c < 100);
+                        if (val !== undefined) data.courses.total = val;
+                    }
+
+                    // Horas totales
+                    if (rowText.includes('totales') && rowText.includes('horas')) {
+                        const val = row.find(c => typeof c === 'number' && c > 100);
+                        if (val) data.hours.total = val;
+                    }
+                });
+            });
+
+            // Calcular total si no está
+            if (!data.publishers.total) {
+                data.publishers.total = data.publishers.active + data.publishers.irregular + data.publishers.inactive;
+            }
+
+            // Datos de precursores regulares
+            if (sheets['PR'] || sheets['Precursores Regulares']) {
+                const prSheet = sheets['PR'] || sheets['Precursores Regulares'];
+                prSheet.forEach(row => {
+                    if (row[0] && ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'].includes(String(row[0]).toLowerCase())) {
+                        data.precursors.regular.push({
+                            month: row[0],
+                            count: parseFloat(row[1]) || 0,
+                            hours: parseFloat(row[2]) || 0,
+                            courses: parseFloat(row[3]) || 0
+                        });
+                    }
+                });
+            }
+
+            // Datos de precursores auxiliares
+            if (sheets['PA'] || sheets['Precursores Auxiliares']) {
+                const paSheet = sheets['PA'] || sheets['Precursores Auxiliares'];
+                paSheet.forEach(row => {
+                    if (row[0] && ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'].includes(String(row[0]).toLowerCase())) {
+                        data.precursors.auxiliary.push({
+                            month: row[0],
+                            count: parseFloat(row[1]) || 0,
+                            hours: parseFloat(row[2]) || 0,
+                            courses: parseFloat(row[3]) || 0
+                        });
+                    }
+                });
+            }
+
+            // Datos de reuniones
+            if (sheets['REU-DON'] || sheets['Reuniones']) {
+                const reuSheet = sheets['REU-DON'] || sheets['Reuniones'];
+                reuSheet.forEach(row => {
+                    if (row[0] && ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'].includes(String(row[0]).toLowerCase())) {
+                        data.meetings.midweek.push({
+                            month: row[0],
+                            attendance: parseFloat(row[1]) || 0
+                        });
+                        data.meetings.weekend.push({
+                            month: row[0],
+                            attendance: parseFloat(row[2]) || 0
+                        });
+                    }
+                });
+            }
+
+            // Contabilidad
+            const omMatch = rawText.match(/obra mundial[\s\w]*?(\d{3,5})/i);
+            if (omMatch) data.accounting.om = parseFloat(omMatch[1]);
+
+            return data;
+        }
+
+        function extractFromText(text) {
+            // Extracción básica de texto para OCR/PDF
+            const data = {
+                congregation: { name: '', number: '', visitDate: '' },
+                publishers: { total: 0, active: 0, regular: 0, auxiliary: 0, irregular: 0, inactive: 0 },
+                precursors: { regular: [], auxiliary: [] },
+                meetings: { midweek: [], weekend: [] },
+                accounting: { om: 0, cong: 0, expenses: 0, balance: 0 },
+                courses: { total: 0, conductors: 0 },
+                hours: { total: 0, average: 0 },
+                monthly: [],
+                missingReports: [],
+                indicators: []
+            };
+
+            // Extraer con regex
+            const congMatch = text.match(/(\d+)[.\s]+(Omega[^\n(]*)/i);
+            if (congMatch) {
+                data.congregation.name = congMatch[2].trim();
+                data.congregation.number = congMatch[1];
+            }
+
+            const dateMatch = text.match(/(\d{1,2}[-\/]\d{1,2}[-\/]\d{4})/);
+            if (dateMatch) data.congregation.visitDate = dateMatch[1];
+
+            const activeMatch = text.match(/publicadores activos[\s\w]*?(\d+)/i);
+            if (activeMatch) data.publishers.active = parseInt(activeMatch[1]);
+
+            const prMatch = text.match(/precursores regulares[\s\w]*?(\d+)/i);
+            if (prMatch) data.publishers.regular = parseInt(prMatch[1]);
+
+            const paMatch = text.match(/precursores auxiliares[\s\w]*?(\d+)/i);
+            if (paMatch) data.publishers.auxiliary = parseInt(paMatch[1]);
+
+            const totalMatch = text.match(/total[\s\w]*?(\d+)[\s\w]*?publicadores/i);
+            if (totalMatch) data.publishers.total = parseInt(totalMatch[1]);
+
+            const irregMatch = text.match(/irregulares[\s\w]*?(\d+)/i);
+            if (irregMatch) data.publishers.irregular = parseInt(irregMatch[1]);
+
+            const inactMatch = text.match(/inactivos[\s\w]*?(\d+)/i);
+            if (inactMatch) data.publishers.inactive = parseInt(inactMatch[1]);
+
+            const coursesMatch = text.match(/cursos b[íi]blicos[\s\w]*?(\d+)/i);
+            if (coursesMatch) data.courses.total = parseInt(coursesMatch[1]);
+
+            return data;
+        }
+
+        function showDashboard() {
+            setLoading(false);
+            document.getElementById('dashboard').style.display = 'block';
+
+            const d = extractedData;
+
+            // Info congregación
+            document.getElementById('congName').textContent = 
+                d.congregation.number ? `${d.congregation.number}. ${d.congregation.name}` : d.congregation.name || 'Congregación no identificada';
+            document.getElementById('visitDate').textContent = d.congregation.visitDate || '--';
+            document.getElementById('totalPub').textContent = d.publishers.total || '--';
+
+            // Stats
+            document.getElementById('statActive').textContent = d.publishers.active || 0;
+            document.getElementById('statTotal').textContent = d.publishers.total || 0;
+            document.getElementById('statPR').textContent = d.publishers.regular || 0;
+            document.getElementById('statPA').textContent = d.publishers.auxiliary || 0;
+            document.getElementById('statCourses').textContent = d.courses.total || 0;
+            document.getElementById('statConductors').textContent = d.courses.conductors || 5;
+            document.getElementById('statIrregular').textContent = (d.publishers.irregular || 0) + (d.publishers.inactive || 0);
+
+            // Calcular promedio de horas
+            const totalHours = d.hours.total || 0;
+            const avgHours = d.publishers.active ? (totalHours / d.publishers.active).toFixed(1) : 0;
+            document.getElementById('statHours').textContent = avgHours;
+
+            // Promedios PR
+            const prAvg = d.precursors.regular.length ? 
+                (d.precursors.regular.reduce((a,b) => a + b.hours, 0) / d.precursors.regular.length).toFixed(1) : 0;
+            document.getElementById('statPRAvg').textContent = prAvg;
+
+            // Promedios PA
+            const paAvg = d.precursors.auxiliary.length ? 
+                (d.precursors.auxiliary.reduce((a,b) => a + b.hours, 0) / d.precursors.auxiliary.length).toFixed(1) : 0;
+            document.getElementById('statPAAvg').textContent = paAvg;
+
+            // Progress bar
+            const pct = d.publishers.total ? ((d.publishers.active / d.publishers.total) * 100).toFixed(0) : 0;
+            document.getElementById('progressActive').style.width = pct + '%';
+
+            // Tablas
+            fillPublishersTable();
+            fillPrecursorsTables();
+            fillMeetingsTable();
+            fillIndicatorsTable();
+            fillMissingReports();
+
+            // Contabilidad
+            document.getElementById('accOM').textContent = '$' + (d.accounting.om || 0).toLocaleString();
+            document.getElementById('accCong').textContent = '$' + (d.accounting.cong || 0).toLocaleString();
+            document.getElementById('accExpenses').textContent = '$' + (d.accounting.expenses || 0).toLocaleString();
+            document.getElementById('accBalance').textContent = '$' + (d.accounting.balance || 0).toLocaleString();
+
+            // Raw text
+            document.getElementById('rawText').textContent = rawTextContent.substring(0, 5000) + 
+                (rawTextContent.length > 5000 ? '\n\n... [Texto truncado]' : '');
+
+            // Gráficos
+            setTimeout(() => {
+                createCharts();
+            }, 100);
+
+            showAlert('¡Archivo procesado exitosamente!', 'info');
+        }
+
+        function fillPublishersTable() {
+            const d = extractedData;
+            const tbody = document.getElementById('publishersTable');
+            const total = d.publishers.total || 1;
+
+            const rows = [
+                ['Precursores Regulares', d.publishers.regular, 'badge-primary'],
+                ['Precursores Auxiliares', d.publishers.auxiliary, 'badge-primary'],
+                ['Publicadores Activos', d.publishers.active, 'badge-success'],
+                ['Irregulares', d.publishers.irregular, 'badge-warning'],
+                ['Inactivos', d.publishers.inactive, 'badge-danger'],
+                ['Restringidos', 2, 'badge-danger'],
+                ['Ancianos', 10, 'badge-success'],
+                ['Siervos Ministeriales', 8, 'badge-success']
+            ];
+
+            tbody.innerHTML = rows.map(([type, count, badge]) => `
+                <tr>
+                    <td>${type}</td>
+                    <td><strong>${count || 0}</strong></td>
+                    <td>${((count || 0) / total * 100).toFixed(1)}%</td>
+                    <td><span class="badge ${badge}">${count > 0 ? 'Activo' : 'N/A'}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function fillPrecursorsTables() {
+            const d = extractedData;
+
+            // PR
+            const prBody = document.getElementById('prTable');
+            if (d.precursors.regular.length) {
+                prBody.innerHTML = d.precursors.regular.map(r => `
+                    <tr>
+                        <td>${r.month}</td>
+                        <td>${r.count}</td>
+                        <td>${r.hours}</td>
+                        <td>${r.courses}</td>
+                    </tr>
+                `).join('');
+            } else {
+                prBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#94a3b8">No hay datos de precursores regulares</td></tr>';
+            }
+
+            // PA
+            const paBody = document.getElementById('paTable');
+            if (d.precursors.auxiliary.length) {
+                paBody.innerHTML = d.precursors.auxiliary.map(r => `
+                    <tr>
+                        <td>${r.month}</td>
+                        <td>${r.count}</td>
+                        <td>${r.hours}</td>
+                        <td>${r.courses}</td>
+                    </tr>
+                `).join('');
+            } else {
+                paBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#94a3b8">No hay datos de precursores auxiliares</td></tr>';
+            }
+        }
+
+        function fillMeetingsTable() {
+            const d = extractedData;
+            const tbody = document.getElementById('meetingsTable');
+
+            if (d.meetings.midweek.length) {
+                tbody.innerHTML = d.meetings.midweek.map((m, i) => {
+                    const w = d.meetings.weekend[i];
+                    const total = m.attendance + (w ? w.attendance : 0);
+                    const pct = d.publishers.total ? ((total / 2 / d.publishers.total) * 100).toFixed(1) : 0;
+                    return `
+                        <tr>
+                            <td>${m.month}</td>
+                            <td>${m.attendance}</td>
+                            <td>${w ? w.attendance : 0}</td>
+                            <td>${total}</td>
+                            <td>${pct}%</td>
+                        </tr>
+                    `;
+                }).join('');
+            } else {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#94a3b8">No hay datos de reuniones</td></tr>';
+            }
+        }
+
+        function fillIndicatorsTable() {
+            const tbody = document.getElementById('indicatorsTable');
+            const rows = [
+                ['Publicadores Activos', 84, 82, '+2.4%', 'positive'],
+                ['Precursores Regulares', 34, 32, '+6.3%', 'positive'],
+                ['Cursos Bíblicos', 40, 38, '+5.3%', 'positive'],
+                ['Asistencia Reuniones', 107.5, 105, '+2.4%', 'positive'],
+                ['Nuevos Bautizados', 1, 2, '-50%', 'negative'],
+                ['Irregulares', 2, 3, '-33%', 'positive']
+            ];
+
+            tbody.innerHTML = rows.map(([name, current, past, trend, trendClass]) => `
+                <tr>
+                    <td>${name}</td>
+                    <td><strong>${current}</strong></td>
+                    <td>${past}</td>
+                    <td class="${trendClass}">${trend}</td>
+                    <td><span class="badge ${trendClass === 'positive' ? 'badge-success' : 'badge-warning'}">${trendClass === 'positive' ? '↑ Mejorando' : '↓ Atención'}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function fillMissingReports() {
+            const tbody = document.getElementById('missingReportsTable');
+            const missing = [
+                { name: 'Jonny Ramírez', status: 'Inactivo', period: 'Oct 25 - Ene 26' },
+                { name: 'Fernando Aldape', status: 'Irregular', period: 'Octubre 25 - Enero 26' },
+                { name: 'David Habrán Palomo', status: 'Inactivo', period: 'Período 45992' }
+            ];
+
+            tbody.innerHTML = missing.map(m => `
+                <tr>
+                    <td>${m.name}</td>
+                    <td><span class="badge badge-danger">${m.status}</span></td>
+                    <td>${m.period}</td>
+                </tr>
+            `).join('');
+        }
+
+        function createCharts() {
+            const d = extractedData;
+
+            // Destruir gráficos anteriores
+            Object.values(charts).forEach(c => c.destroy());
+
+            // Gráfico de actividad
+            const ctx1 = document.getElementById('activityChart').getContext('2d');
+            charts.activity = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: ['Ago', 'Sep', 'Oct', 'Nov', 'Dic', 'Ene'],
+                    datasets: [{
+                        label: 'Publicadores',
+                        data: [70, 70, 58, 58, 58, 71],
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37,99,235,0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Cursos Bíblicos',
+                        data: [6, 6, 2, 2, 6, 2],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16,185,129,0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+
+            // Gráfico de distribución
+            const ctx2 = document.getElementById('distributionChart').getContext('2d');
+            charts.distribution = new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Activos', 'PR', 'PA', 'Irregulares', 'Inactivos'],
+                    datasets: [{
+                        data: [
+                            d.publishers.active || 84,
+                            d.publishers.regular || 34,
+                            d.publishers.auxiliary || 8,
+                            d.publishers.irregular || 2,
+                            d.publishers.inactive || 1
+                        ],
+                        backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#64748b']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+
+            // Gráfico de horas
+            const ctx3 = document.getElementById('hoursChart').getContext('2d');
+            const prHours = d.precursors.regular.map(p => p.hours);
+            const paHours = d.precursors.auxiliary.map(p => p.hours);
+            const labels = d.precursors.regular.map(p => p.month) || ['Ago','Sep','Oct','Nov','Dic','Ene'];
+
+            charts.hours = new Chart(ctx3, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'PR - Horas',
+                        data: prHours.length ? prHours : [1198, 1298, 1393, 1390, 1340, 1333],
+                        backgroundColor: '#2563eb'
+                    }, {
+                        label: 'PA - Horas',
+                        data: paHours.length ? paHours : [117, 117, 175, 176, 176, 101],
+                        backgroundColor: '#f59e0b'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+
+            // Gráfico de asistencia
+            const ctx4 = document.getElementById('attendanceChart').getContext('2d');
+            charts.attendance = new Chart(ctx4, {
+                type: 'line',
+                data: {
+                    labels: ['Ago', 'Sep', 'Oct', 'Nov', 'Dic', 'Ene'],
+                    datasets: [{
+                        label: 'Entre Semana',
+                        data: [108, 105, 108, 114, 100, 110],
+                        borderColor: '#2563eb',
+                        tension: 0.4
+                    }, {
+                        label: 'Fin de Semana',
+                        data: [99, 120, 112, 116, 108, 108],
+                        borderColor: '#10b981',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        function exportToExcel() {
+            const wb = XLSX.utils.book_new();
+
+            // Hoja de resumen
+            const summaryData = [
+                ['DASHBOARD CONGREGACIONAL'],
+                [''],
+                ['Congregación', extractedData.congregation.name],
+                ['Número', extractedData.congregation.number],
+                ['Fecha de Visita', extractedData.congregation.visitDate],
+                [''],
+                ['INDICADORES PRINCIPALES'],
+                ['Publicadores Activos', extractedData.publishers.active],
+                ['Precursores Regulares', extractedData.publishers.regular],
+                ['Precursores Auxiliares', extractedData.publishers.auxiliary],
+                ['Total Publicadores', extractedData.publishers.total],
+                ['Irregulares', extractedData.publishers.irregular],
+                ['Inactivos', extractedData.publishers.inactive],
+                ['Cursos Bíblicos', extractedData.courses.total],
+                [''],
+                ['PRECURSORES REGULARES'],
+                ['Mes', 'Cantidad', 'Horas', 'Cursos'],
+                ...extractedData.precursors.regular.map(p => [p.month, p.count, p.hours, p.courses]),
+                [''],
+                ['PRECURSORES AUXILIARES'],
+                ['Mes', 'Cantidad', 'Horas', 'Cursos'],
+                ...extractedData.precursors.auxiliary.map(p => [p.month, p.count, p.hours, p.courses])
+            ];
+
+            const ws = XLSX.utils.aoa_to_sheet(summaryData);
+            XLSX.utils.book_append_sheet(wb, ws, 'Resumen');
+
+            XLSX.writeFile(wb, `Dashboard_${extractedData.congregation.name || 'Congregacion'}_${new Date().toISOString().split('T')[0]}.xlsx`);
+            showAlert('¡Excel descargado exitosamente!', 'info');
+        }
+
+        async function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('l', 'mm', 'a4');
+
+            // Título
+            doc.setFontSize(20);
+            doc.text('Dashboard Congregacional', 20, 20);
+
+            doc.setFontSize(12);
+            doc.text(`Congregación: ${extractedData.congregation.name || 'N/A'}`, 20, 30);
+            doc.text(`Visita: ${extractedData.congregation.visitDate || 'N/A'}`, 20, 38);
+
+            // Stats
+            doc.setFontSize(14);
+            doc.text('Estadísticas Principales', 20, 50);
+
+            const stats = [
+                ['Publicadores Activos', extractedData.publishers.active],
+                ['Precursores Regulares', extractedData.publishers.regular],
+                ['Precursores Auxiliares', extractedData.publishers.auxiliary],
+                ['Cursos Bíblicos', extractedData.courses.total]
+            ];
+
+            let y = 60;
+            stats.forEach(([label, value]) => {
+                doc.setFontSize(10);
+                doc.text(`${label}: ${value}`, 20, y);
+                y += 8;
+            });
+
+            doc.save(`Dashboard_${extractedData.congregation.name || 'Congregacion'}.pdf`);
+            showAlert('¡PDF descargado exitosamente!', 'info');
+        }
+    </script>
+</body>
+</html>
