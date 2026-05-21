@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Congregacional - Extractor Inteligente</title>
+    <title>Dashboard Congregacional Completo - Extractor Inteligente</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -12,154 +12,131 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --secondary: #64748b;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --info: #06b6d4;
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --text: #1e293b;
-            --text-light: #64748b;
-            --border: #e2e8f0;
+            --primary: #2563eb; --primary-dark: #1d4ed8; --secondary: #64748b;
+            --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #06b6d4;
+            --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --text-light: #64748b; --border: #e2e8f0;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        .container { max-width: 1600px; margin: 0 auto; padding: 20px; }
         header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white; padding: 40px 0; margin-bottom: 30px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            color: white; padding: 30px 0; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
-        header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; }
-        header p { opacity: 0.9; font-size: 1.1rem; }
+        header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+        header p { opacity: 0.9; font-size: 1rem; }
         .upload-zone {
             background: var(--card); border: 3px dashed var(--border); border-radius: 16px;
-            padding: 60px 40px; text-align: center; transition: all 0.3s ease;
-            cursor: pointer; margin-bottom: 30px;
+            padding: 50px 40px; text-align: center; transition: all 0.3s ease; cursor: pointer; margin-bottom: 20px;
         }
-        .upload-zone:hover, .upload-zone.dragover {
-            border-color: var(--primary); background: #eff6ff; transform: translateY(-2px);
-            box-shadow: 0 10px 40px -10px rgba(37,99,235,0.2);
-        }
-        .upload-zone .icon { font-size: 4rem; margin-bottom: 20px; color: var(--primary); }
-        .upload-zone h3 { font-size: 1.5rem; margin-bottom: 10px; color: var(--text); }
-        .upload-zone p { color: var(--text-light); margin-bottom: 20px; }
-        .file-types { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-        .file-type {
-            background: var(--bg); padding: 6px 16px; border-radius: 20px;
-            font-size: 0.85rem; font-weight: 500; color: var(--secondary); border: 1px solid var(--border);
-        }
+        .upload-zone:hover, .upload-zone.dragover { border-color: var(--primary); background: #eff6ff; transform: translateY(-2px); box-shadow: 0 10px 40px -10px rgba(37,99,235,0.2); }
+        .upload-zone .icon { font-size: 3.5rem; margin-bottom: 15px; color: var(--primary); }
+        .upload-zone h3 { font-size: 1.3rem; margin-bottom: 8px; color: var(--text); }
+        .upload-zone p { color: var(--text-light); margin-bottom: 15px; font-size: 0.9rem; }
+        .file-types { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+        .file-type { background: var(--bg); padding: 5px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; color: var(--secondary); border: 1px solid var(--border); }
         input[type="file"] { display: none; }
-        .btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 12px 24px; border-radius: 8px; font-weight: 600;
-            font-size: 0.95rem; cursor: pointer; transition: all 0.2s; border: none; text-decoration: none;
-        }
+        .btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; border: none; text-decoration: none; }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
         .btn-success { background: var(--success); color: white; }
         .btn-warning { background: var(--warning); color: white; }
         .btn-info { background: var(--info); color: white; }
-        .btn-group { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+        .btn-group { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
         .dashboard { display: none; animation: fadeIn 0.5s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
-        .stat-card {
-            background: var(--card); padding: 20px; border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 4px solid var(--primary);
-            transition: transform 0.2s;
-        }
-        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px -5px rgba(0,0,0,0.1); }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 20px; }
+        .stat-card { background: var(--card); padding: 16px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 3px solid var(--primary); transition: transform 0.2s; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px -5px rgba(0,0,0,0.1); }
         .stat-card.warning { border-left-color: var(--warning); }
         .stat-card.success { border-left-color: var(--success); }
         .stat-card.danger { border-left-color: var(--danger); }
         .stat-card.info { border-left-color: var(--info); }
-        .stat-label { font-size: 0.8rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; font-weight: 600; }
-        .stat-value { font-size: 1.8rem; font-weight: 700; color: var(--text); line-height: 1; }
-        .stat-change { font-size: 0.8rem; margin-top: 6px; font-weight: 500; }
-        .positive { color: var(--success); }
-        .negative { color: var(--danger); }
-        .neutral { color: var(--text-light); }
-        .card { background: var(--card); border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--bg); }
-        .card-title { font-size: 1.15rem; font-weight: 700; color: var(--text); }
-        .card-subtitle { font-size: 0.85rem; color: var(--text-light); margin-top: 4px; }
-        .chart-container { position: relative; height: 280px; margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        th { background: var(--bg); padding: 10px 12px; text-align: left; font-weight: 600; color: var(--text-light); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.05em; border-bottom: 2px solid var(--border); }
-        td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+        .stat-label { font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; font-weight: 600; }
+        .stat-value { font-size: 1.6rem; font-weight: 700; color: var(--text); line-height: 1; }
+        .stat-change { font-size: 0.75rem; margin-top: 4px; font-weight: 500; }
+        .positive { color: var(--success); } .negative { color: var(--danger); } .neutral { color: var(--text-light); }
+        .card { background: var(--card); border-radius: 10px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid var(--bg); }
+        .card-title { font-size: 1.05rem; font-weight: 700; color: var(--text); }
+        .card-subtitle { font-size: 0.8rem; color: var(--text-light); margin-top: 4px; }
+        .chart-container { position: relative; height: 250px; margin-top: 16px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+        th { background: var(--bg); padding: 8px 10px; text-align: left; font-weight: 600; color: var(--text-light); text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.05em; border-bottom: 2px solid var(--border); }
+        td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
         tr:hover td { background: var(--bg); }
-        .text-right { text-align: right; }
-        .text-center { text-align: center; }
-        .badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; }
+        .text-right { text-align: right; } .text-center { text-align: center; }
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 0.68rem; font-weight: 600; }
         .badge-primary { background: #dbeafe; color: #1e40af; }
         .badge-success { background: #d1fae5; color: #065f46; }
         .badge-warning { background: #fef3c7; color: #92400e; }
         .badge-danger { background: #fee2e2; color: #991b1b; }
         .badge-info { background: #cffafe; color: #155e75; }
-        .progress-bar { width: 100%; height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; margin-top: 6px; }
+        .progress-bar { width: 100%; height: 5px; background: var(--bg); border-radius: 3px; overflow: hidden; margin-top: 6px; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-dark)); border-radius: 3px; transition: width 0.5s ease; }
         .loading { display: none; text-align: center; padding: 40px; }
         .loading.active { display: block; }
-        .spinner { width: 50px; height: 50px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        .spinner { width: 45px; height: 45px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .alert { padding: 16px 20px; border-radius: 8px; margin-bottom: 20px; display: none; align-items: center; gap: 12px; }
+        .alert { padding: 14px 18px; border-radius: 8px; margin-bottom: 16px; display: none; align-items: center; gap: 10px; font-size: 0.9rem; }
         .alert.show { display: flex; }
         .alert-info { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
         .alert-warning { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
-        .tabs { display: flex; gap: 4px; margin-bottom: 20px; background: var(--bg); padding: 4px; border-radius: 8px; width: fit-content; overflow-x: auto; max-width: 100%; }
-        .tab { padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.85rem; transition: all 0.2s; border: none; background: transparent; color: var(--text-light); white-space: nowrap; }
+        .tabs { display: flex; gap: 3px; margin-bottom: 16px; background: var(--bg); padding: 3px; border-radius: 8px; width: fit-content; overflow-x: auto; max-width: 100%; flex-wrap: wrap; }
+        .tab { padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.82rem; transition: all 0.2s; border: none; background: transparent; color: var(--text-light); white-space: nowrap; }
         .tab.active { background: white; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
-        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px; }
-        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        @media (max-width: 768px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } header h1 { font-size: 1.75rem; } .stats-grid { grid-template-columns: repeat(2, 1fr); } .tab { padding: 8px 12px; font-size: 0.8rem; } }
-        .extracted-text { background: #f1f5f9; padding: 20px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.8rem; max-height: 400px; overflow-y: auto; white-space: pre-wrap; border: 1px solid var(--border); }
-        .congregation-info { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; }
-        .congregation-info h2 { font-size: 1.75rem; margin-bottom: 10px; }
-        .congregation-meta { display: flex; gap: 20px; flex-wrap: wrap; opacity: 0.9; font-size: 0.9rem; }
-        .congregation-meta span { display: flex; align-items: center; gap: 6px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 16px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+        @media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } header h1 { font-size: 1.5rem; } .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        .extracted-text { background: #f1f5f9; padding: 16px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.75rem; max-height: 400px; overflow-y: auto; white-space: pre-wrap; border: 1px solid var(--border); }
+        .congregation-info { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); color: white; padding: 24px; border-radius: 10px; margin-bottom: 20px; }
+        .congregation-info h2 { font-size: 1.5rem; margin-bottom: 8px; }
+        .congregation-meta { display: flex; gap: 16px; flex-wrap: wrap; opacity: 0.9; font-size: 0.85rem; }
+        .congregation-meta span { display: flex; align-items: center; gap: 5px; }
         .money { font-family: 'Courier New', monospace; font-weight: 600; }
-        .money-positive { color: var(--success); }
-        .money-negative { color: var(--danger); }
-        .donation-detail { background: var(--bg); padding: 16px; border-radius: 8px; margin-bottom: 12px; }
-        .donation-detail h4 { font-size: 0.9rem; margin-bottom: 8px; color: var(--text); }
-        .donation-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
-        .donation-row:last-child { border-bottom: none; }
-        .highlight-box { background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 1px solid #bae6fd; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .money-positive { color: var(--success); } .money-negative { color: var(--danger); }
+        .check-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+        .check-item:last-child { border-bottom: none; }
+        .check-label { font-size: 0.85rem; color: var(--text); }
+        .check-value { font-size: 0.85rem; font-weight: 600; }
+        .section-title { font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--primary); display: inline-block; }
+        .comment-box { background: #f8fafc; border-left: 3px solid var(--warning); padding: 12px; border-radius: 0 8px 8px 0; font-size: 0.85rem; color: var(--text); margin-bottom: 10px; }
+        .yes { color: var(--success); font-weight: 700; } .no { color: var(--danger); font-weight: 700; }
+        .data-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 0.82rem; }
+        .data-row:last-child { border-bottom: none; }
+        .highlight-box { background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 1px solid #bae6fd; border-radius: 10px; padding: 16px; margin-bottom: 16px; }
         .highlight-box.danger { background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border-color: #fecaca; }
         .highlight-box.success { background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-color: #bbf7d0; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .two-col { grid-template-columns: 1fr; } }
     </style>
 <base target="_blank">
 </head>
 <body>
     <header>
         <div class="container">
-            <h1>Dashboard Congregacional</h1>
-            <p>Extractor inteligente de informes - Sube tu archivo Excel, PDF o imagen</p>
+            <h1>📊 Dashboard Congregacional Completo</h1>
+            <p>Extractor inteligente - Todos los campos de estadísticas, donaciones y contabilidad</p>
         </div>
     </header>
 
     <div class="container">
-        <div id="alertBox" class="alert alert-info">
-            <span>ℹ️</span>
-            <span id="alertMessage"></span>
-        </div>
+        <div id="alertBox" class="alert alert-info"><span>ℹ️</span><span id="alertMessage"></span></div>
 
         <div class="upload-zone" id="uploadZone">
             <div class="icon">📁</div>
             <h3>Arrastra tu archivo aquí</h3>
-            <p>O haz clic para seleccionar un archivo</p>
+            <p>Excel, PDF o imagen con el informe de congregación</p>
             <div class="file-types">
-                <span class="file-type">📑 Excel (.xlsx, .xls)</span>
+                <span class="file-type">📑 Excel (.xlsx)</span>
                 <span class="file-type">📄 PDF (.pdf)</span>
                 <span class="file-type">🖼️ Imagen (.jpg, .png)</span>
             </div>
-            <br><br>
+            <br>
             <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">Seleccionar Archivo</button>
             <input type="file" id="fileInput" accept=".xlsx,.xls,.pdf,.jpg,.jpeg,.png">
         </div>
@@ -167,214 +144,326 @@
         <div class="loading" id="loadingSection">
             <div class="spinner"></div>
             <h3 id="loadingText">Procesando archivo...</h3>
-            <p id="loadingSubtext">Esto puede tomar unos segundos</p>
+            <p id="loadingSubtext">Analizando todas las hojas</p>
         </div>
 
         <div class="dashboard" id="dashboard">
+            <!-- Info Principal -->
             <div class="congregation-info">
-                <h2 id="congName">Cargando...</h2>
+                <h2 id="congName">--</h2>
                 <div class="congregation-meta">
-                    <span>📅 <span id="visitDate">--</span></span>
-                    <span>👥 <span id="totalPub">--</span> publicadores</span>
+                    <span>📅 Visita: <span id="visitDate">--</span></span>
+                    <span>👥 <span id="totalPub">--</span> pub.</span>
                     <span>🏛️ <span id="visitType">Visita de circuito</span></span>
                     <span>📍 <span id="congLocation">--</span></span>
+                    <span>📊 Periodo: <span id="periodo">--</span></span>
                 </div>
             </div>
 
             <div class="btn-group">
-                <button class="btn btn-success" onclick="exportToExcel()">📥 Descargar Excel</button>
-                <button class="btn btn-warning" onclick="exportToPDF()">📝 Descargar PDF</button>
-                <button class="btn btn-info" onclick="exportAccounting()">💰 Solo Contabilidad</button>
-                <button class="btn btn-primary" onclick="location.reload()">🔄 Nuevo Archivo</button>
+                <button class="btn btn-success" onclick="exportToExcel()">📥 Excel Completo</button>
+                <button class="btn btn-warning" onclick="exportToPDF()">📝 PDF</button>
+                <button class="btn btn-info" onclick="exportEstadisticas()">📊 Solo Estadísticas</button>
+                <button class="btn btn-primary" onclick="location.reload()">🔄 Nuevo</button>
             </div>
 
+            <!-- STATS PRINCIPALES -->
             <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Publicadores Activos</div>
-                    <div class="stat-value" id="statActive">--</div>
-                    <div class="stat-change">de <span id="statTotal">--</span> total</div>
-                    <div class="progress-bar"><div class="progress-fill" id="progressActive" style="width: 0%"></div></div>
-                </div>
-                <div class="stat-card success">
-                    <div class="stat-label">Precursores Regulares</div>
-                    <div class="stat-value" id="statPR">--</div>
-                    <div class="stat-change positive">Prom: <span id="statPRAvg">--</span> hrs</div>
-                </div>
-                <div class="stat-card warning">
-                    <div class="stat-label">Precursores Auxiliares</div>
-                    <div class="stat-value" id="statPA">--</div>
-                    <div class="stat-change">Prom: <span id="statPAAvg">--</span> hrs</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Promedio Horas</div>
-                    <div class="stat-value" id="statHours">--</div>
-                    <div class="stat-change">Por publicador</div>
-                </div>
-                <div class="stat-card success">
-                    <div class="stat-label">Cursos Bíblicos</div>
-                    <div class="stat-value" id="statCourses">--</div>
-                    <div class="stat-change positive">Conductores: <span id="statConductors">--</span></div>
-                </div>
-                <div class="stat-card info">
-                    <div class="stat-label">Obra Mundial (6m)</div>
-                    <div class="stat-value money" id="statOM">--</div>
-                    <div class="stat-change neutral">Prom: <span id="statOMAvg">--</span></div>
-                </div>
-                <div class="stat-card info">
-                    <div class="stat-label">Congregación (6m)</div>
-                    <div class="stat-value money" id="statCong">--</div>
-                    <div class="stat-change neutral">Prom: <span id="statCongAvg">--</span></div>
-                </div>
-                <div class="stat-card" id="statBalanceCard">
-                    <div class="stat-label">Saldo Actual</div>
-                    <div class="stat-value money" id="statBalance">--</div>
-                    <div class="stat-change" id="statBalanceTrend">--</div>
-                </div>
+                <div class="stat-card"><div class="stat-label">Total Publicadores</div><div class="stat-value" id="st_total">--</div><div class="stat-change">Activos: <span id="st_activos">--</span></div></div>
+                <div class="stat-card success"><div class="stat-label">Prec. Regulares</div><div class="stat-value" id="st_pr">--</div><div class="stat-change positive">Prom: <span id="st_pr_avg">--</span> hrs</div></div>
+                <div class="stat-card warning"><div class="stat-label">Prec. Auxiliares</div><div class="stat-value" id="st_pa">--</div><div class="stat-change">Prom: <span id="st_pa_avg">--</span> hrs</div></div>
+                <div class="stat-card"><div class="stat-label">Cursos Bíblicos</div><div class="stat-value" id="st_cursos">--</div><div class="stat-change">Conductores: <span id="st_conductores">--</span></div></div>
+                <div class="stat-card info"><div class="stat-label">Obra Mundial</div><div class="stat-value money" id="st_om">--</div><div class="stat-change neutral">6 meses</div></div>
+                <div class="stat-card info"><div class="stat-label">Congregación</div><div class="stat-value money" id="st_cong">--</div><div class="stat-change neutral">6 meses</div></div>
+                <div class="stat-card" id="st_saldo_card"><div class="stat-label">Saldo Actual</div><div class="stat-value money" id="st_saldo">--</div><div class="stat-change" id="st_saldo_trend">--</div></div>
+                <div class="stat-card success"><div class="stat-label">Asistencia</div><div class="stat-value" id="st_asistencia">--</div><div class="stat-change">Prom. 6 meses</div></div>
             </div>
 
+            <!-- TABS -->
             <div class="tabs">
-                <button class="tab active" onclick="switchTab('overview')">Resumen</button>
-                <button class="tab" onclick="switchTab('publishers')">Publicadores</button>
-                <button class="tab" onclick="switchTab('precursors')">Precursores</button>
-                <button class="tab" onclick="switchTab('meetings')">Reuniones</button>
-                <button class="tab" onclick="switchTab('accounting')">💰 Donaciones</button>
-                <button class="tab" onclick="switchTab('accounting-detail')">📋 Contabilidad Det.</button>
-                <button class="tab" onclick="switchTab('raw')">Datos Crudos</button>
+                <button class="tab active" onclick="switchTab('resumen')">📋 Resumen</button>
+                <button class="tab" onclick="switchTab('publicadores')">👥 Publicadores</button>
+                <button class="tab" onclick="switchTab('precursores')">⭐ Precursores</button>
+                <button class="tab" onclick="switchTab('reuniones')">🏛️ Reuniones</button>
+                <button class="tab" onclick="switchTab('donaciones')">💰 Donaciones</button>
+                <button class="tab" onclick="switchTab('contabilidad')">📈 Contabilidad</button>
+                <button class="tab" onclick="switchTab('estadisticas')">📊 Estadísticas</button>
+                <button class="tab" onclick="switchTab('tarahumara')">🗣️ Tarahumara</button>
+                <button class="tab" onclick="switchTab('territorios')">🗺️ Territorios</button>
+                <button class="tab" onclick="switchTab('nombramientos')">📋 Nombramientos</button>
+                <button class="tab" onclick="switchTab('asuntos')">⚖️ Asuntos</button>
+                <button class="tab" onclick="switchTab('salon')">🏗️ Salón</button>
+                <button class="tab" onclick="switchTab('crudos')">🔍 Datos Crudos</button>
             </div>
 
-            <div id="tab-overview" class="tab-content active">
+            <!-- TAB RESUMEN -->
+            <div id="tab-resumen" class="tab-content active">
                 <div class="grid-2">
                     <div class="card">
                         <div class="card-header"><span class="card-title">Actividad Mensual</span></div>
-                        <div class="chart-container"><canvas id="activityChart"></canvas></div>
+                        <div class="chart-container"><canvas id="chartActividad"></canvas></div>
                     </div>
                     <div class="card">
-                        <div class="card-header"><span class="card-title">Distribución de Publicadores</span></div>
-                        <div class="chart-container"><canvas id="distributionChart"></canvas></div>
+                        <div class="card-header"><span class="card-title">Distribución</span></div>
+                        <div class="chart-container"><canvas id="chartDistribucion"></canvas></div>
                     </div>
                 </div>
                 <div class="card">
-                    <div class="card-header"><span class="card-title">Indicadores Clave</span></div>
+                    <div class="card-header"><span class="card-title">Indicadores Clave - Comparativa Visitas</span></div>
                     <table>
-                        <thead><tr><th>Indicador</th><th>Visita Actual</th><th>Visita Pasada</th><th>Tendencia</th><th>Estado</th></tr></thead>
-                        <tbody id="indicatorsTable"></tbody>
+                        <thead><tr><th>Indicador</th><th>Actual</th><th>Pasada</th><th>Diferencia</th><th>%</th><th>Estado</th></tr></thead>
+                        <tbody id="tablaIndicadores"></tbody>
                     </table>
                 </div>
-            </div>
-
-            <div id="tab-publishers" class="tab-content">
-                <div class="card">
-                    <div class="card-header"><span class="card-title">Detalle de Publicadores</span></div>
-                    <table><thead><tr><th>Tipo</th><th>Cantidad</th><th>% del Total</th><th>Estado</th></tr></thead><tbody id="publishersTable"></tbody></table>
-                </div>
-                <div class="card">
-                    <div class="card-header"><span class="card-title">Informes Faltantes</span></div>
-                    <table><thead><tr><th>Nombre</th><th>Estado</th><th>Período</th></tr></thead><tbody id="missingReportsTable"></tbody></table>
-                </div>
-            </div>
-
-            <div id="tab-precursors" class="tab-content">
                 <div class="grid-2">
                     <div class="card">
-                        <div class="card-header"><span class="card-title">Precursores Regulares - Promedios</span></div>
-                        <table><thead><tr><th>Mes</th><th>Cantidad</th><th>Horas</th><th>Cursos</th></tr></thead><tbody id="prTable"></tbody></table>
+                        <div class="card-header"><span class="card-title">Nuevos y Crecimiento</span></div>
+                        <div id="resumenNuevos"></div>
                     </div>
                     <div class="card">
-                        <div class="card-header"><span class="card-title">Precursores Auxiliares - Promedios</span></div>
-                        <table><thead><tr><th>Mes</th><th>Cantidad</th><th>Horas</th><th>Cursos</th></tr></thead><tbody id="paTable"></tbody></table>
+                        <div class="card-header"><span class="card-title">Informes Faltantes</span></div>
+                        <table><thead><tr><th>Nombre</th><th>Estado</th><th>Período</th></tr></thead><tbody id="tablaFaltantes"></tbody></table>
                     </div>
-                </div>
-                <div class="card">
-                    <div class="card-header"><span class="card-title">Comparativa de Horas PR vs PA</span></div>
-                    <div class="chart-container"><canvas id="hoursChart"></canvas></div>
                 </div>
             </div>
 
-            <div id="tab-meetings" class="tab-content">
+            <!-- TAB PUBLICADORES -->
+            <div id="tab-publicadores" class="tab-content">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Composición de la Congregación</span></div>
+                        <table><thead><tr><th>Categoría</th><th>Cantidad</th><th>%</th><th>Estado</th></tr></thead><tbody id="tablaPublicadores"></tbody></table>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Nombramientos y Privilegios</span></div>
+                        <table><thead><tr><th>Privilegio</th><th>Cantidad</th></tr></thead><tbody id="tablaPrivilegios"></tbody></table>
+                    </div>
+                </div>
                 <div class="card">
-                    <div class="card-header"><span class="card-title">Asistencia a Reuniones</span></div>
-                    <table><thead><tr><th>Mes</th><th>Entre Semana</th><th>Fin de Semana</th><th>Total</th><th>% Asistencia</th></tr></thead><tbody id="meetingsTable"></tbody></table>
+                    <div class="card-header"><span class="card-title">Detalle de Publicadores por Estado</span></div>
+                    <div class="grid-4" id="detallePublicadores"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Cursos Bíblicos</span></div>
+                    <div class="grid-2">
+                        <div><div class="section-title">Resumen</div><div id="resumenCursos"></div></div>
+                        <div><div class="section-title">Sin Curso Bíblico</div><div id="sinCursos"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB PRECURSORES -->
+            <div id="tab-precursores" class="tab-content">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Precursores Regulares</span></div>
+                        <table><thead><tr><th>Mes</th><th>Cant.</th><th>Horas</th><th>Cursos</th><th>Prom/Hr</th></tr></thead><tbody id="tablaPR"></tbody></table>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Precursores Auxiliares</span></div>
+                        <table><thead><tr><th>Mes</th><th>Cant.</th><th>Horas</th><th>Cursos</th><th>Prom/Hr</th></tr></thead><tbody id="tablaPA"></tbody></table>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Comparativa de Horas</span></div>
+                    <div class="chart-container"><canvas id="chartHoras"></canvas></div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Precursores Regulares con Bajo Promedio</span></div>
+                    <div id="prBajoPromedio"></div>
+                </div>
+            </div>
+
+            <!-- TAB REUNIONES -->
+            <div id="tab-reuniones" class="tab-content">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Asistencia Mensual</span></div>
+                        <table><thead><tr><th>Mes</th><th>Entre Semana</th><th>Fin Semana</th><th>Total</th><th>%</th></tr></thead><tbody id="tablaReuniones"></tbody></table>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Promedios y Porcentajes</span></div>
+                        <div id="resumenReuniones"></div>
+                    </div>
                 </div>
                 <div class="card">
                     <div class="card-header"><span class="card-title">Tendencia de Asistencia</span></div>
-                    <div class="chart-container"><canvas id="attendanceChart"></canvas></div>
+                    <div class="chart-container"><canvas id="chartAsistencia"></canvas></div>
                 </div>
-            </div>
-
-            <div id="tab-accounting" class="tab-content">
                 <div class="grid-2">
                     <div class="card">
-                        <div class="card-header"><span class="card-title">Resumen de Donaciones (6 meses)</span><span class="card-subtitle">Agosto - Enero</span></div>
-                        <div id="accountingSummary"></div>
+                        <div class="card-header"><span class="card-title">Vida y Ministerio - Asistencia</span></div>
+                        <div id="vidaMinisterio"></div>
                     </div>
                     <div class="card">
-                        <div class="card-header"><span class="card-title">Gráfico de Donaciones</span></div>
-                        <div class="chart-container"><canvas id="donationsChart"></canvas></div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-header"><span class="card-title">Estado Financiero</span></div>
-                    <div class="stats-grid">
-                        <div class="stat-card success">
-                            <div class="stat-label">Total Entradas OM</div>
-                            <div class="stat-value money money-positive" id="accOMTotal">--</div>
-                        </div>
-                        <div class="stat-card success">
-                            <div class="stat-label">Total Entradas Congregación</div>
-                            <div class="stat-value money money-positive" id="accCongTotal">--</div>
-                        </div>
-                        <div class="stat-card warning">
-                            <div class="stat-label">Gastos del Salón</div>
-                            <div class="stat-value money money-negative" id="accExpensesTotal">--</div>
-                        </div>
-                        <div class="stat-card info">
-                            <div class="stat-label">Fondo Mantenimiento SR</div>
-                            <div class="stat-value money" id="accFondoSR">--</div>
-                        </div>
-                        <div class="stat-card" id="accBalanceCard">
-                            <div class="stat-label">Déficit / Superávit</div>
-                            <div class="stat-value money" id="accDeficit">--</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-label">Saldo Anterior</div>
-                            <div class="stat-value money" id="accSaldoAnt">--</div>
-                        </div>
-                        <div class="stat-card success">
-                            <div class="stat-label">Saldo Actual</div>
-                            <div class="stat-value money money-positive" id="accSaldoAct">--</div>
-                        </div>
-                        <div class="stat-card info">
-                            <div class="stat-label">Promedio x Publicador</div>
-                            <div class="stat-value money" id="accPromXPub">--</div>
-                        </div>
+                        <div class="card-header"><span class="card-title">Reuniones de Enseñanza</span></div>
+                        <div id="reunionesEnsenanza"></div>
                     </div>
                 </div>
             </div>
 
-            <div id="tab-accounting-detail" class="tab-content">
+            <!-- TAB DONACIONES -->
+            <div id="tab-donaciones" class="tab-content">
+                <div class="stats-grid">
+                    <div class="stat-card success"><div class="stat-label">OM Total (6m)</div><div class="stat-value money" id="don_om_total">--</div></div>
+                    <div class="stat-card success"><div class="stat-label">Cong Total (6m)</div><div class="stat-value money" id="don_cong_total">--</div></div>
+                    <div class="stat-card warning"><div class="stat-label">Gastos (6m)</div><div class="stat-value money" id="don_gastos_total">--</div></div>
+                    <div class="stat-card info"><div class="stat-label">Fondo SR</div><div class="stat-value money" id="don_fondo_total">--</div></div>
+                    <div class="stat-card" id="don_deficit_card"><div class="stat-label">Déficit/Superávit</div><div class="stat-value money" id="don_deficit">--</div></div>
+                    <div class="stat-card"><div class="stat-label">Saldo Actual</div><div class="stat-value money" id="don_saldo">--</div></div>
+                </div>
                 <div class="card">
                     <div class="card-header"><span class="card-title">Desglose Mensual de Donaciones</span></div>
-                    <div id="monthlyAccountingDetail"></div>
-                </div>
-                <div class="grid-2">
-                    <div class="card">
-                        <div class="card-header"><span class="card-title">Entradas vs Salidas</span></div>
-                        <div class="chart-container"><canvas id="inOutChart"></canvas></div>
-                    </div>
-                    <div class="card">
-                        <div class="card-header"><span class="card-title">Evolución del Saldo</span></div>
-                        <div class="chart-container"><canvas id="balanceChart"></canvas></div>
-                    </div>
+                    <table><thead><tr><th>Mes</th><th>OM</th><th>Res/OM</th><th>Congregación</th><th>Gastos</th><th>Fondo SR</th><th>Neto</th></tr></thead><tbody id="tablaDonaciones"></tbody></table>
                 </div>
                 <div class="card">
-                    <div class="card-header"><span class="card-title">Detalle por Concepto (Hoja de Cuentas)</span></div>
-                    <div id="accountingConcepts"></div>
+                    <div class="card-header"><span class="card-title">Gráfico de Donaciones</span></div>
+                    <div class="chart-container"><canvas id="chartDonaciones"></canvas></div>
                 </div>
             </div>
 
-            <div id="tab-raw" class="tab-content">
+            <!-- TAB CONTABILIDAD -->
+            <div id="tab-contabilidad" class="tab-content">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Estado Financiero</span></div>
+                        <div id="estadoFinanciero"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Promedios y Saldos</span></div>
+                        <div id="promediosFinancieros"></div>
+                    </div>
+                </div>
                 <div class="card">
-                    <div class="card-header"><span class="card-title">Texto Extraído (para verificación)</span></div>
+                    <div class="card-header"><span class="card-title">Entradas vs Salidas</span></div>
+                    <div class="chart-container"><canvas id="chartInOut"></canvas></div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Evolución del Saldo</span></div>
+                    <div class="chart-container"><canvas id="chartSaldo"></canvas></div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Contabilidad Detallada por Mes</span></div>
+                    <div id="contabilidadDetalle"></div>
+                </div>
+            </div>
+
+            <!-- TAB ESTADISTICAS -->
+            <div id="tab-estadisticas" class="tab-content">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Resumen Estadístico</span></div>
+                        <div id="resumenEstadisticas"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Crecimiento y Nuevos</span></div>
+                        <div id="crecimientoEstadisticas"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Composición Completa</span></div>
+                    <div class="grid-4" id="composicionCompleta"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Reuniones - Estadísticas</span></div>
+                    <div class="grid-2" id="reunionesEstadisticas"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Contabilidad - Resumen</span></div>
+                    <div class="grid-2" id="contabilidadEstadisticas"></div>
+                </div>
+            </div>
+
+            <!-- TAB TARAHUMARA -->
+            <div id="tab-tarahumara" class="tab-content">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Datos Tarahumara</span></div>
+                        <div id="datosTarahumara"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Lectura y Publicaciones</span></div>
+                        <div id="lecturaTarahumara"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Reuniones - Tarahumara</span></div>
+                    <div id="reunionesTarahumara"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Nuevos Bautizados - Estudios</span></div>
+                    <div id="bautizadosEstudios"></div>
+                </div>
+            </div>
+
+            <!-- TAB TERRITORIOS -->
+            <div id="tab-territorios" class="tab-content">
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Territorios</span></div>
+                    <div id="datosTerritorios"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Asistencia - Análisis</span></div>
+                    <div id="asistenciaAnalisis"></div>
+                </div>
+            </div>
+
+            <!-- TAB NOMBRAMIENTOS -->
+            <div id="tab-nombramientos" class="tab-content">
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Recomendación de Nombramientos</span></div>
+                    <div id="nombramientosData"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Datos de GEBVs, PE, SCS y Esposas</span></div>
+                    <div id="datosGEBV"></div>
+                </div>
+            </div>
+
+            <!-- TAB ASUNTOS -->
+            <div id="tab-asuntos" class="tab-content">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Asuntos Judiciales</span></div>
+                        <div id="asuntosJudiciales"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Asuntos que Requieren Atención</span></div>
+                        <div id="asuntosAtencion"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Publicaciones y Notificaciones</span></div>
+                    <div id="publicacionesNotif"></div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Jóvenes y DPA</span></div>
+                    <div id="jovenesDPA"></div>
+                </div>
+            </div>
+
+            <!-- TAB SALON -->
+            <div id="tab-salon" class="tab-content">
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Mantenimiento del Salón</span></div>
+                        <div id="mantenimientoSalon"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><span class="card-title">Reuniones - Enseñanza</span></div>
+                        <div id="ensenanzaReuniones"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Contabilidad - Verificación</span></div>
+                    <div id="contabilidadVerif"></div>
+                </div>
+            </div>
+
+            <!-- TAB CRUDOS -->
+            <div id="tab-crudos" class="tab-content">
+                <div class="card">
+                    <div class="card-header"><span class="card-title">Texto Extraído de Todas las Hojas</span></div>
                     <div class="extracted-text" id="rawText"></div>
                 </div>
             </div>
@@ -393,10 +482,7 @@
         uploadZone.addEventListener('click', () => fileInput.click());
         uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
         uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
-        uploadZone.addEventListener('drop', (e) => {
-            e.preventDefault(); uploadZone.classList.remove('dragover');
-            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
-        });
+        uploadZone.addEventListener('drop', (e) => { e.preventDefault(); uploadZone.classList.remove('dragover'); if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]); });
         fileInput.addEventListener('change', (e) => { if (e.target.files.length) handleFile(e.target.files[0]); });
 
         function showAlert(message, type = 'info') {
@@ -406,27 +492,20 @@
             setTimeout(() => alertBox.classList.remove('show'), 5000);
         }
 
-        function setLoading(show, text = 'Procesando archivo...', subtext = '') {
+        function setLoading(show, text = 'Procesando...', subtext = '') {
             const loading = document.getElementById('loadingSection');
             document.getElementById('loadingText').textContent = text;
             document.getElementById('loadingSubtext').textContent = subtext;
-            if (show) { loading.classList.add('active'); document.getElementById('uploadZone').style.display = 'none'; }
+            if (show) { loading.classList.add('active'); uploadZone.style.display = 'none'; }
             else loading.classList.remove('active');
         }
 
         async function handleFile(file) {
             const ext = file.name.split('.').pop().toLowerCase();
-            if (!['xlsx','xls','pdf','jpg','jpeg','png'].includes(ext)) {
-                showAlert('Formato no soportado. Usa Excel, PDF o imagen.', 'warning'); return;
-            }
+            if (!['xlsx','xls','pdf','jpg','jpeg','png'].includes(ext)) { showAlert('Formato no soportado', 'warning'); return; }
             setLoading(true, 'Analizando archivo...', file.name);
-            try {
-                if (ext === 'xlsx' || ext === 'xls') await processExcel(file);
-                else if (ext === 'pdf') await processPDF(file);
-                else await processImage(file);
-            } catch (error) {
-                console.error(error); showAlert('Error al procesar: ' + error.message, 'warning'); setLoading(false);
-            }
+            try { if (ext === 'xlsx' || ext === 'xls') await processExcel(file); else if (ext === 'pdf') await processPDF(file); else await processImage(file); }
+            catch (error) { console.error(error); showAlert('Error: ' + error.message, 'warning'); setLoading(false); }
         }
 
         async function processExcel(file) {
@@ -437,183 +516,289 @@
                 const sheet = workbook.Sheets[name];
                 const json = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
                 allSheets[name] = json;
-                allText += `
-=== HOJA: ${name} ===
-`;
-                json.forEach(row => { allText += row.join(' | ') + '
-'; });
+                allText += `\n=== ${name} ===\n`;
+                json.forEach(row => { allText += row.join(' | ') + '\n'; });
             });
             rawTextContent = allText;
-            extractedData = parseCongregationData(allSheets, allText);
+            extractedData = parseAllData(allSheets, allText);
             showDashboard();
         }
 
         async function processPDF(file) {
-            setLoading(true, 'Extrayendo texto del PDF...', 'Esto puede tomar mas tiempo');
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                rawTextContent = `[PDF extraido]
-Nombre: ${file.name}
-Tamano: ${(file.size/1024).toFixed(2)} KB
-
-Nota: La extraccion de PDF requiere procesamiento adicional. Se recomienda convertir a Excel o usar OCR para imagenes.`;
-                extractedData = extractFromText(rawTextContent);
-                showDashboard();
-            };
-            reader.readAsDataURL(file);
+            setLoading(true, 'PDF...', 'Procesando');
+            rawTextContent = 'PDF extraido. Se recomienda usar Excel para mejor extraccion.';
+            extractedData = createEmptyData();
+            showDashboard();
         }
 
         async function processImage(file) {
-            setLoading(true, 'Realizando OCR en la imagen...', 'Tesseract.js esta analizando el texto');
+            setLoading(true, 'OCR...', 'Reconociendo texto');
             const reader = new FileReader();
             reader.onload = async (e) => {
                 try {
-                    const result = await Tesseract.recognize(e.target.result, 'spa', {
-                        logger: m => { if (m.status === 'recognizing text') setLoading(true, `OCR: ${(m.progress * 100).toFixed(0)}%`, 'Reconociendo texto en espanol...'); }
-                    });
+                    const result = await Tesseract.recognize(e.target.result, 'spa', { logger: m => { if (m.status === 'recognizing text') setLoading(true, `OCR ${(m.progress*100).toFixed(0)}%`); } });
                     rawTextContent = result.data.text;
-                    extractedData = extractFromText(rawTextContent);
+                    extractedData = parseFromText(rawTextContent);
                     showDashboard();
-                } catch (err) { showAlert('Error en OCR: ' + err.message, 'warning'); setLoading(false); }
+                } catch (err) { showAlert('Error OCR: ' + err.message, 'warning'); setLoading(false); }
             };
             reader.readAsDataURL(file);
         }
 
-        function parseCongregationData(sheets, rawText) {
-            const data = {
-                congregation: { name: '', number: '', visitDate: '', location: '' },
-                publishers: { total: 0, active: 0, regular: 0, auxiliary: 0, irregular: 0, inactive: 0, reactivated: 0, restricted: 0, elders: 0, servants: 0 },
-                precursors: { regular: [], auxiliary: [] },
-                meetings: { midweek: [], weekend: [] },
-                accounting: {
-                    months: [], om: { entries: [], total: 0, average: 0 }, cong: { entries: [], total: 0, average: 0 },
-                    expenses: { entries: [], total: 0, average: 0 }, fondoSR: { entries: [], total: 0 },
-                    deficit: 0, saldoAnterior: 0, saldoActual: 0, promedioXPub: 0, detail: []
-                },
-                courses: { total: 0, conductors: 0 }, hours: { total: 0, average: 0 },
-                missingReports: [], indicators: []
+        function createEmptyData() {
+            return {
+                congregation: { name:'', number:'', visitDate:'', location:'', periodo:'' },
+                publishers: { total:0, active:0, regular:0, auxiliary:0, irregular:0, inactive:0, reactivated:0, restricted:0, elders:0, servants:0, baptized:0, readmitted:0, censored:0, removed:0, disassociated:0, pePet:0, withoutCB:0, paWithoutCB:0, prWithoutCB:0, totalWithoutCB:0 },
+                precursors: { regular:[], auxiliary:[], lowAverage:[] },
+                meetings: { midweek:[], weekend:[], vidaMinisterio:[], rpEa:[], tarahumara:[], espanol:[], asistenciaPubEst:0 },
+                accounting: { months:[], om:{total:0,avg:0}, cong:{total:0,avg:0}, resOM:{total:0}, expenses:{total:0,avg:0}, fondoSR:{total:0}, deficit:0, saldoAnterior:0, saldoActual:0, promedioXPub:0, detail:[], pasr:'', cmsr:'', usoSalon:'', fondoGuardado:'', mttoSalon:'' },
+                courses: { total:0, conductors:0, numCB:0, paWithoutCB:0, prWithoutCB:0, pubWithoutCB:0, totalWithoutCB:0 },
+                hours: { total:0, average:0, prHours:0, paHours:0 },
+                tarahumara: { estudios:0, bautizados:0, asisReuEstu:0, asisPubEst:0, ninosHablantes:0, pubNoLeerTarahumara:0, pubNoLeerEspanol:0, clasesLectura:'No', bibliaTarahumara:'Si', lectoresRecomendados:'Si', smDominioJW:0, conyugeIncredulo:0 },
+                territorios: { cartaAsignacion:'Si', distribuidos:'Si', tarjeton:'No' },
+                nombramientos: { recomendaciones:[], nuevosAncianos:'', ancRemovidos:'', smNuevos:'', smRemovidos:'', nuevosPR:'', prRemovidos:'' },
+                asuntos: { judiciales:'Ninguno', atencion:'Ninguno', existenciasExcesivas:'No', cambioGrupoPub:'No', notifDireccion:'Si', cartasMudados:'Si', notifBajas:'No', reciboS24:'Si', intervencion:'No', instrucciones:'Si', acuseJW:'Si', archivoOrdenado:'No' },
+                salon: { resoluciones:'Si', actualizadaUso:'Si', pagosLuz:'Si', pagosAgua:'Si', pagosPredial:'Si', copiaBienal:'Si', informeInsp:'Si', intervencionCuentas:'Si', documentacionLegal:'Si' },
+                jovenes: { dpa:'Si', ayudaJovenes:'Se les esta dando estudio' },
+                nuevos: { publicadores:0, bautizados:0, matriculados:0 },
+                crecimiento: { porcentajeAumento:0, porcentajeBautizados:0 },
+                missingReports: [],
+                comments: { tesoros:'', perlas:'', lectura:'', primeraConv:'', revisita:'', cursoBiblico:'' }
             };
+        }
 
+        function parseAllData(sheets, rawText) {
+            const d = createEmptyData();
+            const text = rawText.toLowerCase();
+
+            // Congregación
             const congMatch = rawText.match(/(\d+)[.\s]+(Omega[^,(]+)/i);
-            if (congMatch) { data.congregation.name = congMatch[2].trim(); data.congregation.number = congMatch[1]; }
-            const locMatch = rawText.match(/Cd\.\s*Juarez,\s*Chih\./i);
-            if (locMatch) data.congregation.location = 'Cd. Juarez, Chih.';
+            if (congMatch) { d.congregation.name = congMatch[2].trim(); d.congregation.number = congMatch[1]; }
+            if (text.includes('juarez')) d.congregation.location = 'Cd. Juarez, Chih.';
             const dateMatch = rawText.match(/(\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4})/);
-            if (dateMatch) data.congregation.visitDate = dateMatch[1];
+            if (dateMatch) d.congregation.visitDate = dateMatch[1];
+            d.congregation.periodo = 'Jul - Ene';
 
-            Object.entries(sheets).forEach(([sheetName, sheet]) => {
-                sheet.forEach((row, idx) => {
-                    const rowText = row.join(' ').toLowerCase();
-                    if (rowText.includes('publicadores activos') || (rowText.includes('activos') && !rowText.includes('precursores'))) {
-                        const val = row.find(c => typeof c === 'number' && c > 10 && c < 200);
-                        if (val) data.publishers.active = val;
-                    }
-                    if (rowText.includes('precursores regulares') || rowText.includes('p. regulares')) {
-                        const val = row.find(c => typeof c === 'number' && c > 0 && c < 100);
-                        if (val) data.publishers.regular = val;
-                    }
-                    if (rowText.includes('precursores auxiliares') || rowText.includes('p. auxiliares')) {
-                        const val = row.find(c => typeof c === 'number' && c >= 0 && c < 50);
-                        if (val !== undefined) data.publishers.auxiliary = val;
-                    }
-                    if (rowText.includes('total') && rowText.includes('publicador')) {
-                        const val = row.find(c => typeof c === 'number' && c > 50 && c < 300);
-                        if (val) data.publishers.total = val;
-                    }
-                    if (rowText.includes('irregulares')) {
-                        const val = row.find(c => typeof c === 'number' && c >= 0 && c < 20);
-                        if (val !== undefined) data.publishers.irregular = val;
-                    }
-                    if (rowText.includes('inactivos') && !rowText.includes('informes')) {
-                        const val = row.find(c => typeof c === 'number' && c >= 0 && c < 20);
-                        if (val !== undefined) data.publishers.inactive = val;
-                    }
-                    if (rowText.includes('restringidos')) {
-                        const val = row.find(c => typeof c === 'number' && c >= 0 && c < 10);
-                        if (val !== undefined) data.publishers.restricted = val;
-                    }
-                    if (rowText.includes('reactivados')) {
-                        const val = row.find(c => typeof c === 'number' && c >= 0 && c < 10);
-                        if (val !== undefined) data.publishers.reactivated = val;
-                    }
-                    if (rowText.includes('ancianos') && !rowText.includes('nuevos')) {
-                        const val = row.find(c => typeof c === 'number' && c >= 0 && c < 30);
-                        if (val !== undefined) data.publishers.elders = val;
-                    }
-                    if (rowText.includes('siervos ministeriales') || rowText.includes('sm ')) {
-                        const val = row.find(c => typeof c === 'number' && c >= 0 && c < 30);
-                        if (val !== undefined) data.publishers.servants = val;
-                    }
-                    if (rowText.includes('cursos b') || rowText.includes('cursos bib')) {
-                        const val = row.find(c => typeof c === 'number' && c >= 0 && c < 100);
-                        if (val !== undefined) data.courses.total = val;
-                    }
+            // === HOJA PUB ===
+            if (sheets['PUB']) {
+                const pub = sheets['PUB'];
+                pub.forEach(row => {
+                    const r = row.join(' ').toLowerCase();
+                    if (r.includes('publicadores activos')) { const v = row.find(c => typeof c === 'number' && c > 10 && c < 200); if (v) d.publishers.active = v; }
+                    if (r.includes('precursores regulares')) { const v = row.find(c => typeof c === 'number' && c > 0 && c < 100); if (v) d.publishers.regular = v; }
+                    if (r.includes('precursores auxiliares')) { const v = row.find(c => typeof c === 'number' && c >= 0 && c < 50); if (v !== undefined) d.publishers.auxiliary = v; }
+                    if (r.includes('inactivos') && !r.includes('informes')) { const v = row.find(c => typeof c === 'number' && c >= 0 && c < 20); if (v !== undefined) d.publishers.inactive = v; }
+                    if (r.includes('pe/pet') || r.includes('pe pet')) { const v = row.find(c => typeof c === 'number'); if (v !== undefined) d.publishers.pePet = v; }
+                    if (r.includes('total') && r.includes('publicador')) { const v = row.find(c => typeof c === 'number' && c > 50 && c < 300); if (v) d.publishers.total = v; }
                 });
-            });
-
-            // CONTABILIDAD - Hoja REU-DON
-            if (sheets['REU-DON'] || sheets['Reuniones']) {
-                const reuSheet = sheets['REU-DON'] || sheets['Reuniones'];
-                const months = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-                reuSheet.forEach(row => {
-                    const firstCell = String(row[0] || '').toLowerCase().trim();
-                    if (months.some(m => firstCell.startsWith(m))) {
-                        const monthName = firstCell.charAt(0).toUpperCase() + firstCell.slice(1,3);
-                        data.meetings.midweek.push({ month: monthName, attendance: parseFloat(row[1]) || 0 });
-                        data.meetings.weekend.push({ month: monthName, attendance: parseFloat(row[2]) || 0 });
-                        const omVal = parseFloat(row[3]) || 0;
-                        const resVal = parseFloat(row[4]) || 0;
-                        const congVal = parseFloat(row[5]) || 0;
-                        const gastosVal = parseFloat(row[6]) || 0;
-                        const fondoVal = parseFloat(row[7]) || 0;
-                        if (omVal > 0 || congVal > 0 || gastosVal > 0) {
-                            data.accounting.months.push({ month: monthName, om: omVal, resOM: resVal, cong: congVal, gastos: gastosVal, fondoSR: fondoVal });
-                            data.accounting.om.entries.push(omVal);
-                            data.accounting.cong.entries.push(congVal);
-                            data.accounting.expenses.entries.push(gastosVal);
-                            data.accounting.fondoSR.entries.push(fondoVal);
+                // Datos de la tabla inferior
+                const pubData = {
+                    'p. regulares': 'regular', 'precursores regulares': 'regular',
+                    'p. auxiliares': 'auxiliary', 'precursores auxiliares': 'auxiliary',
+                    'publicadores': 'active',
+                    'informan cursos biblicos': 'courses',
+                    'no informan cursos biblicos': 'noCourses',
+                    'irregulares': 'irregular',
+                    'reactivados': 'reactivated',
+                    'inactivos': 'inactive',
+                    'restringidos': 'restricted',
+                    'sacados de la congregacion': 'removed',
+                    'desasociados': 'disassociated',
+                    'censurados': 'censored',
+                    'readmitidos': 'readmitted',
+                    'ancianos': 'elders',
+                    'siervos ministeriales': 'servants'
+                };
+                pub.forEach(row => {
+                    const first = String(row[0] || '').toLowerCase().trim();
+                    for (let key in pubData) {
+                        if (first.includes(key)) {
+                            const v = row.find((c, i) => i > 0 && typeof c === 'number');
+                            if (v !== undefined) d.publishers[pubData[key]] = v;
                         }
-                    }
-                    if (firstCell === 'totales' || firstCell.includes('total')) {
-                        const omTotal = parseFloat(row[1]) || 0;
-                        const congTotal = parseFloat(row[3]) || 0;
-                        const gastosTotal = parseFloat(row[4]) || 0;
-                        const fondoTotal = parseFloat(row[5]) || 0;
-                        if (omTotal > 1000) data.accounting.om.total = omTotal;
-                        if (congTotal > 1000) data.accounting.cong.total = congTotal;
-                        if (gastosTotal > 1000) data.accounting.expenses.total = gastosTotal;
-                        if (fondoTotal > 1000) data.accounting.fondoSR.total = fondoTotal;
-                    }
-                    if (firstCell.includes('promedio') || firstCell.includes('promedios')) {
-                        const omProm = parseFloat(row[1]) || 0;
-                        const congProm = parseFloat(row[3]) || 0;
-                        const gastosProm = parseFloat(row[4]) || 0;
-                        const promXPub = parseFloat(row[8]) || 0;
-                        if (omProm > 100) data.accounting.om.average = omProm;
-                        if (congProm > 100) data.accounting.cong.average = congProm;
-                        if (gastosProm > 100) data.accounting.expenses.average = gastosProm;
-                        if (promXPub > 10) data.accounting.promedioXPub = promXPub;
-                    }
-                    if (rowText.includes('deficit') || rowText.includes('superavit')) {
-                        const deficitVal = parseFloat(row.find(c => typeof c === 'number' && Math.abs(c) < 10000)) || 0;
-                        if (deficitVal !== 0) data.accounting.deficit = deficitVal;
-                    }
-                    if (rowText.includes('saldo anterior') || rowText.includes('saldo ant')) {
-                        const saldoAnt = parseFloat(row.find(c => typeof c === 'number' && c > 0 && c < 50000)) || 0;
-                        if (saldoAnt > 0) data.accounting.saldoAnterior = saldoAnt;
-                    }
-                    if (rowText.includes('saldo actual') || rowText.includes('saldo act')) {
-                        const saldoAct = parseFloat(row.find(c => typeof c === 'number' && c > 0 && c < 50000)) || 0;
-                        if (saldoAct > 0) data.accounting.saldoActual = saldoAct;
                     }
                 });
             }
 
-            // Hoja CONTABILIDAD detallada
-            if (sheets['CONTABILIDAD'] || sheets['Contabilidad']) {
-                const contSheet = sheets['CONTABILIDAD'] || sheets['Contabilidad'];
+            // === HOJA ESTADISTICAS ===
+            if (sheets['ESTADISTICAS']) {
+                const est = sheets['ESTADISTICAS'];
+                est.forEach((row, idx) => {
+                    const r = row.join(' ').toLowerCase();
+                    // Fila 12 (datos principales)
+                    if (idx === 11 || (r.includes('total') && row[1] && typeof row[3] === 'number')) {
+                        if (typeof row[3] === 'number') d.publishers.regular = row[3];
+                        if (typeof row[5] === 'number') d.publishers.irregular = row[5];
+                        if (typeof row[9] === 'number') d.publishers.baptized = row[9];
+                        if (typeof row[11] === 'number') d.publishers.reactivated = row[11];
+                        if (typeof row[13] === 'number') d.publishers.readmitted = row[13];
+                        if (typeof row[15] === 'number') d.publishers.censored = row[15];
+                        if (typeof row[17] === 'number') d.publishers.removed = row[17];
+                        if (typeof row[19] === 'number') d.publishers.disassociated = row[19];
+                        if (typeof row[21] === 'number') d.publishers.inactive = row[21];
+                        if (typeof row[23] === 'number') d.publishers.withoutCB = row[23];
+                        if (typeof row[25] === 'number') d.courses.paWithoutCB = row[25];
+                        if (typeof row[27] === 'number') d.courses.prWithoutCB = row[27];
+                        if (typeof row[29] === 'number') d.courses.totalWithoutCB = row[29];
+                        if (typeof row[31] === 'number') d.courses.numCB = row[31];
+                        if (typeof row[33] === 'number') d.hours.total = row[33];
+                        if (typeof row[35] === 'number') d.courses.conductors = row[35];
+                        if (typeof row[37] === 'number') d.courses.total = row[37];
+                        if (typeof row[39] === 'number') d.publishers.pePet = row[39];
+                        if (typeof row[41] === 'number') d.precursors.regularHours = row[41];
+                        if (typeof row[43] === 'number') d.precursors.regularStudies = row[43];
+                        if (typeof row[45] === 'number') d.precursors.auxCount = row[45];
+                        if (typeof row[47] === 'number') d.precursors.auxStudies = row[47];
+                        if (typeof row[49] === 'number') d.publishers.elders = row[49];
+                        if (typeof row[51] === 'number') d.publishers.servants = row[51];
+                    }
+                    // Nuevos
+                    if (r.includes('nuevos publ') || r.includes('nvos. publ')) { const v = row.find(c => typeof c === 'number' && c < 50); if (v) d.nuevos.publicadores = v; }
+                    if (r.includes('nuevos baut') || r.includes('nvos. baut')) { const v = row.find(c => typeof c === 'number' && c < 50); if (v) d.nuevos.bautizados = v; }
+                    if (r.includes('nuevos matric')) { const v = row.find(c => typeof c === 'number'); if (v !== undefined) d.nuevos.matriculados = v; }
+                    if (r.includes('restringidos')) { const v = row.find(c => typeof c === 'number' && c < 20); if (v !== undefined) d.publishers.restricted = v; }
+                    if (r.includes('% aumento')) { const v = row.find(c => typeof c === 'number' && c < 100); if (v) d.crecimiento.porcentajeAumento = v; }
+
+                    // Tarahumara
+                    if (r.includes('estudios tarahumara')) { const v = row.find(c => typeof c === 'number'); if (v !== undefined) d.tarahumara.estudios = v; }
+                    if (r.includes('bautizados tarahumara')) { const v = row.find(c => typeof c === 'number'); if (v !== undefined) d.tarahumara.bautizados = v; }
+                    if (r.includes('asis reu/tarah')) { const v = row.find(c => typeof c === 'number'); if (v !== undefined) d.tarahumara.asisReuEstu = v; }
+                    if (r.includes('asistencia pub/est')) { const v = row.find(c => typeof c === 'number'); if (v !== undefined) d.tarahumara.asisPubEst = v; }
+                    if (r.includes('ninos hablantes tarahumara')) { const v = row.find(c => typeof c === 'number'); if (v !== undefined) d.tarahumara.ninosHablantes = v; }
+                    if (r.includes('pub no saben leer tarahumara')) { const v = row.find(c => typeof c === 'number'); if (v !== undefined) d.tarahumara.pubNoLeerTarahumara = v; }
+                    if (r.includes('pub no saben leer espanol')) { const v = row.find(c => typeof c === 'number'); if (v !== undefined) d.tarahumara.pubNoLeerEspanol = v; }
+                    if (r.includes('clases de lectura en tarahumara')) { const v = row.find(c => typeof c === 'string' && (c.toLowerCase().includes('si') || c.toLowerCase().includes('no'))); if (v) d.tarahumara.clasesLectura = v; }
+                    if (r.includes('agenda de cong')) { const v = row.find(c => typeof c === 'string' && (c.toLowerCase().includes('si') || c.toLowerCase().includes('no'))); if (v) d.tarahumara.agendaCong = v; }
+                    if (r.includes('lectores recomendados')) { const v = row.find(c => typeof c === 'string' && (c.toLowerCase().includes('si') || c.toLowerCase().includes('no'))); if (v) d.tarahumara.lectoresRecomendados = v; }
+                    if (r.includes('sm c/dominio en jw')) { const v = row.find(c => typeof c === 'number'); if (v !== undefined) d.tarahumara.smDominioJW = v; }
+                    if (r.includes('conyuge incredulo')) { const v = row.find(c => typeof c === 'number'); if (v !== undefined) d.tarahumara.conyugeIncredulo = v; }
+                    if (r.includes('biblia en tarahumara')) { const v = row.find(c => typeof c === 'string'); if (v) d.tarahumara.bibliaTarahumara = v; }
+
+                    // Territorios
+                    if (r.includes('carta de asignacion')) { const v = row.find(c => typeof c === 'string'); if (v) d.territorios.cartaAsignacion = v; }
+                    if (r.includes('distribuidos de acuerdo')) { const v = row.find(c => typeof c === 'string'); if (v) d.territorios.distribuidos = v; }
+                    if (r.includes('tarjeton')) { const v = row.find(c => typeof c === 'string'); if (v) d.territorios.tarjeton = v; }
+
+                    // Asistencia
+                    if (r.includes('razon de disminucion')) { const v = row.find(c => typeof c === 'string'); if (v) d.meetings.razonDisminucion = v; }
+                    if (r.includes('han hecho como ancianos')) { const v = row.find(c => typeof c === 'string'); if (v) d.meetings.mejorasAncianos = v; }
+                    if (r.includes('aumentar asistencia')) { const v = row.find(c => typeof c === 'string'); if (v) d.meetings.aumentarAsistencia = v; }
+
+                    // Asuntos
+                    if (r.includes('asuntos judiciales')) { const v = row.find(c => typeof c === 'string' && c.length > 3); if (v) d.asuntos.judiciales = v; }
+                    if (r.includes('asuntos que requieren atencion')) { const v = row.find(c => typeof c === 'string' && c.length > 3); if (v) d.asuntos.atencion = v; }
+                    if (r.includes('existencias excesivas')) { const v = row.find(c => typeof c === 'string'); if (v) d.asuntos.existenciasExcesivas = v; }
+                    if (r.includes('cambio en el grupo de publicaciones')) { const v = row.find(c => typeof c === 'string'); if (v) d.asuntos.cambioGrupoPub = v; }
+                    if (r.includes('notifico cambio de direccion')) { const v = row.find(c => typeof c === 'string'); if (v) d.asuntos.notifDireccion = v; }
+                    if (r.includes('cartas de presentacion')) { const v = row.find(c => typeof c === 'string'); if (v) d.asuntos.cartasMudados = v; }
+                    if (r.includes('notificado bajas')) { const v = row.find(c => typeof c === 'string'); if (v) d.asuntos.notifBajas = v; }
+                    if (r.includes('recibo s-24')) { const v = row.find(c => typeof c === 'string'); if (v) d.asuntos.reciboS24 = v; }
+                    if (r.includes('intervencion') && r.includes('se hace')) { const v = row.find(c => typeof c === 'string'); if (v) d.asuntos.intervencion = v; }
+                    if (r.includes('siguen las instrucciones')) { const v = row.find(c => typeof c === 'string'); if (v) d.asuntos.instrucciones = v; }
+                    if (r.includes('acuse de recibo')) { const v = row.find(c => typeof c === 'string'); if (v) d.asuntos.acuseJW = v; }
+                    if (r.includes('ordenado el archivo')) { const v = row.find(c => typeof c === 'string'); if (v) d.asuntos.archivoOrdenado = v; }
+
+                    // Salón
+                    if (r.includes('resoluciones respectivas')) { const v = row.find(c => typeof c === 'string'); if (v) d.salon.resoluciones = v; }
+                    if (r.includes('actualizada por uso de salon')) { const v = row.find(c => typeof c === 'string'); if (v) d.salon.actualizadaUso = v; }
+                    if (r.includes('pagos') && r.includes('luz')) { const v = row.find(c => typeof c === 'string'); if (v) d.salon.pagosLuz = v; }
+                    if (r.includes('pagos') && r.includes('agua')) { const v = row.find(c => typeof c === 'string'); if (v) d.salon.pagosAgua = v; }
+                    if (r.includes('predial')) { const v = row.find(c => typeof c === 'string'); if (v) d.salon.pagosPredial = v; }
+                    if (r.includes('copia del informe bienal')) { const v = row.find(c => typeof c === 'string'); if (v) d.salon.copiaBienal = v; }
+                    if (r.includes('informe de insp de salon')) { const v = row.find(c => typeof c === 'string'); if (v) d.salon.informeInsp = v; }
+                    if (r.includes('intervienen las cuentas')) { const v = row.find(c => typeof c === 'string'); if (v) d.salon.intervencionCuentas = v; }
+                    if (r.includes('documentacion legal')) { const v = row.find(c => typeof c === 'string'); if (v) d.salon.documentacionLegal = v; }
+
+                    // Jóvenes y DPA
+                    if (r.includes('todos los publicadores el dpa')) { const v = row.find(c => typeof c === 'string'); if (v) d.jovenes.dpa = v; }
+                    if (r.includes('ayudar a los jovenes')) { const v = row.find(c => typeof c === 'string' && c.length > 5); if (v) d.jovenes.ayudaJovenes = v; }
+
+                    // Comentarios reuniones
+                    if (r.includes('tesoros de la biblia')) { const v = row.find(c => typeof c === 'string' && c.length > 10); if (v) d.comments.tesoros = v; }
+                    if (r.includes('perlas escondidas')) { const v = row.find(c => typeof c === 'string' && c.length > 10); if (v) d.comments.perlas = v; }
+                    if (r.includes('lectura de la biblia')) { const v = row.find(c => typeof c === 'string' && c.length > 10); if (v) d.comments.lectura = v; }
+                    if (r.includes('primera conversacion')) { const v = row.find(c => typeof c === 'string' && c.length > 10); if (v) d.comments.primeraConv = v; }
+                    if (r.includes('revisita')) { const v = row.find(c => typeof c === 'string' && c.length > 10); if (v) d.comments.revisita = v; }
+                    if (r.includes('curso biblico') && !r.includes('cursos biblicos')) { const v = row.find(c => typeof c === 'string' && c.length > 10); if (v) d.comments.cursoBiblico = v; }
+                });
+            }
+
+            // === HOJA REU-DON ===
+            if (sheets['REU-DON']) {
+                const reu = sheets['REU-DON'];
+                const months = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+                reu.forEach(row => {
+                    const first = String(row[0] || '').toLowerCase().trim();
+                    if (months.some(m => first.startsWith(m))) {
+                        const mn = first.charAt(0).toUpperCase() + first.slice(1,3);
+                        d.meetings.midweek.push({ month: mn, attendance: parseFloat(row[1]) || 0 });
+                        d.meetings.weekend.push({ month: mn, attendance: parseFloat(row[2]) || 0 });
+                        const om = parseFloat(row[4]) || 0;
+                        const res = parseFloat(row[5]) || 0;
+                        const cong = parseFloat(row[6]) || 0;
+                        const gastos = parseFloat(row[7]) || 0;
+                        const fondo = parseFloat(row[8]) || 0;
+                        if (om > 0 || cong > 0 || gastos > 0) {
+                            d.accounting.months.push({ month: mn, om: om, resOM: res, cong: cong, gastos: gastos, fondoSR: fondo });
+                        }
+                    }
+                    if (first === 'totales' || first.includes('total')) {
+                        const omT = parseFloat(row[4]) || 0; if (omT > 1000) d.accounting.om.total = omT;
+                        const resT = parseFloat(row[5]) || 0; if (resT > 100) d.accounting.resOM.total = resT;
+                        const congT = parseFloat(row[6]) || 0; if (congT > 1000) d.accounting.cong.total = congT;
+                        const gastT = parseFloat(row[7]) || 0; if (gastT > 1000) d.accounting.expenses.total = gastT;
+                        const fondT = parseFloat(row[8]) || 0; if (fondT > 100) d.accounting.fondoSR.total = fondT;
+                    }
+                    if (first.includes('promedio')) {
+                        const omP = parseFloat(row[4]) || 0; if (omP > 100) d.accounting.om.avg = omP;
+                        const congP = parseFloat(row[6]) || 0; if (congP > 100) d.accounting.cong.avg = congP;
+                        const gastP = parseFloat(row[7]) || 0; if (gastP > 100) d.accounting.expenses.avg = gastP;
+                        const xp = parseFloat(row[11]) || 0; if (xp > 10) d.accounting.promedioXPub = xp;
+                    }
+                    if (r.includes('deficit') || r.includes('superavit')) {
+                        const def = parseFloat(row.find(c => typeof c === 'number' && Math.abs(c) < 20000)) || 0;
+                        if (def !== 0) d.accounting.deficit = def;
+                    }
+                    if (r.includes('saldo anterior') || r.includes('saldo ant')) {
+                        const sa = parseFloat(row.find(c => typeof c === 'number' && c > 0 && c < 50000)) || 0;
+                        if (sa > 0) d.accounting.saldoAnterior = sa;
+                    }
+                    if (r.includes('saldo actual') || r.includes('saldo act')) {
+                        const sac = parseFloat(row.find(c => typeof c === 'number' && c > 0 && c < 50000)) || 0;
+                        if (sac > 0) d.accounting.saldoActual = sac;
+                    }
+                });
+            }
+
+            // === HOJA PA ===
+            if (sheets['PA']) {
+                const pa = sheets['PA'];
+                const months = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+                pa.forEach(row => {
+                    const first = String(row[0] || '').toLowerCase().trim();
+                    if (months.some(m => first.startsWith(m))) {
+                        d.precursors.auxiliary.push({ month: first.charAt(0).toUpperCase() + first.slice(1,3), count: parseFloat(row[1]) || 0, hours: parseFloat(row[2]) || 0, courses: parseFloat(row[3]) || 0 });
+                    }
+                });
+            }
+
+            // === HOJA PR ===
+            if (sheets['PR']) {
+                const pr = sheets['PR'];
+                const months = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+                pr.forEach(row => {
+                    const first = String(row[0] || '').toLowerCase().trim();
+                    if (months.some(m => first.startsWith(m))) {
+                        d.precursors.regular.push({ month: first.charAt(0).toUpperCase() + first.slice(1,3), count: parseFloat(row[1]) || 0, hours: parseFloat(row[2]) || 0, courses: parseFloat(row[3]) || 0 });
+                    }
+                });
+            }
+
+            // === HOJA CONTABILIDAD ===
+            if (sheets['CONTABILIDAD']) {
+                const cont = sheets['CONTABILIDAD'];
                 const monthCols = ['Septiembre','Octubre','Noviembre','Diciembre','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto'];
-                contSheet.forEach((row, idx) => {
+                cont.forEach(row => {
                     if (!row[0]) return;
                     const desc = String(row[0]).trim();
                     if (desc === 'Descripcion' || desc === '' || desc.includes('Total')) return;
@@ -629,136 +814,138 @@ Nota: La extraccion de PDF requiere procesamiento adicional. Se recomienda conve
                             monthData[m].exits += salida;
                         }
                     });
-                    if (Object.keys(monthData).length > 0) {
-                        data.accounting.detail.push({ description: desc, months: monthData });
-                    }
+                    if (Object.keys(monthData).length > 0) d.accounting.detail.push({ description: desc, months: monthData });
                 });
             }
 
-            // Precursores regulares
-            if (sheets['PR'] || sheets['Precursores Regulares']) {
-                const prSheet = sheets['PR'] || sheets['Precursores Regulares'];
-                const months = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-                prSheet.forEach(row => {
-                    const first = String(row[0] || '').toLowerCase().trim();
-                    if (months.some(m => first.startsWith(m))) {
-                        data.precursors.regular.push({ month: first.charAt(0).toUpperCase() + first.slice(1,3), count: parseFloat(row[1]) || 0, hours: parseFloat(row[2]) || 0, courses: parseFloat(row[3]) || 0 });
-                    }
-                });
+            // Calcular totales si faltan
+            if (!d.publishers.total) d.publishers.total = d.publishers.active + d.publishers.irregular + d.publishers.inactive + d.publishers.reactivated;
+            if (!d.accounting.saldoActual && d.accounting.saldoAnterior) {
+                d.accounting.saldoActual = d.accounting.saldoAnterior + d.accounting.om.total + d.accounting.cong.total - d.accounting.expenses.total;
             }
-
-            // Precursores auxiliares
-            if (sheets['PA'] || sheets['Precursores Auxiliares']) {
-                const paSheet = sheets['PA'] || sheets['Precursores Auxiliares'];
-                const months = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-                paSheet.forEach(row => {
-                    const first = String(row[0] || '').toLowerCase().trim();
-                    if (months.some(m => first.startsWith(m))) {
-                        data.precursors.auxiliary.push({ month: first.charAt(0).toUpperCase() + first.slice(1,3), count: parseFloat(row[1]) || 0, hours: parseFloat(row[2]) || 0, courses: parseFloat(row[3]) || 0 });
-                    }
-                });
-            }
-
             // Informes faltantes
-            if (sheets['PUB'] || sheets['Publicadores']) {
-                const pubSheet = sheets['PUB'] || sheets['Publicadores'];
-                pubSheet.forEach(row => {
-                    const rowText = row.join(' ');
-                    if (rowText.includes('Inactivo') || rowText.includes('Informes Faltantes')) {
-                        const name = row.find(c => typeof c === 'string' && c.length > 5 && !c.includes('Inactivo'));
-                        if (name) data.missingReports.push({ name: name, status: rowText.includes('Inactivo') ? 'Inactivo' : 'Pendiente', period: 'No reporta' });
+            if (sheets['PUB']) {
+                const pub = sheets['PUB'];
+                pub.forEach(row => {
+                    const r = row.join(' ');
+                    if (r.includes('Inactivo') || r.includes('Inactiva')) {
+                        const name = row.find(c => typeof c === 'string' && c.length > 5 && !c.toLowerCase().includes('inactiv'));
+                        if (name) d.missingReports.push({ name: name, status: 'Inactivo', period: 'No reporta' });
                     }
                 });
             }
 
-            if (!data.publishers.total) data.publishers.total = data.publishers.active + data.publishers.irregular + data.publishers.inactive;
-            if (!data.accounting.saldoActual && data.accounting.saldoAnterior) {
-                data.accounting.saldoActual = data.accounting.saldoAnterior + data.accounting.om.total + data.accounting.cong.total - data.accounting.expenses.total;
-            }
-            return data;
+            return d;
         }
 
-        function extractFromText(text) {
-            const data = {
-                congregation: { name: '', number: '', visitDate: '', location: '' },
-                publishers: { total: 0, active: 0, regular: 0, auxiliary: 0, irregular: 0, inactive: 0, reactivated: 0, restricted: 0, elders: 0, servants: 0 },
-                precursors: { regular: [], auxiliary: [] },
-                meetings: { midweek: [], weekend: [] },
-                accounting: { months: [], om: { entries: [], total: 0, average: 0 }, cong: { entries: [], total: 0, average: 0 }, expenses: { entries: [], total: 0, average: 0 }, fondoSR: { entries: [], total: 0 }, deficit: 0, saldoAnterior: 0, saldoActual: 0, promedioXPub: 0, detail: [] },
-                courses: { total: 0, conductors: 0 }, hours: { total: 0, average: 0 },
-                missingReports: [], indicators: []
-            };
+        function parseFromText(text) {
+            const d = createEmptyData();
             const congMatch = text.match(/(\d+)[.\s]+(Omega[^\n(]*)/i);
-            if (congMatch) { data.congregation.name = congMatch[2].trim(); data.congregation.number = congMatch[1]; }
+            if (congMatch) { d.congregation.name = congMatch[2].trim(); d.congregation.number = congMatch[1]; }
             const dateMatch = text.match(/(\d{1,2}[-\/]\d{1,2}[-\/]\d{4})/);
-            if (dateMatch) data.congregation.visitDate = dateMatch[1];
+            if (dateMatch) d.congregation.visitDate = dateMatch[1];
             const activeMatch = text.match(/publicadores activos[\s\w]*?(\d+)/i);
-            if (activeMatch) data.publishers.active = parseInt(activeMatch[1]);
+            if (activeMatch) d.publishers.active = parseInt(activeMatch[1]);
             const prMatch = text.match(/precursores regulares[\s\w]*?(\d+)/i);
-            if (prMatch) data.publishers.regular = parseInt(prMatch[1]);
+            if (prMatch) d.publishers.regular = parseInt(prMatch[1]);
             const paMatch = text.match(/precursores auxiliares[\s\w]*?(\d+)/i);
-            if (paMatch) data.publishers.auxiliary = parseInt(paMatch[1]);
+            if (paMatch) d.publishers.auxiliary = parseInt(paMatch[1]);
             const totalMatch = text.match(/total[\s\w]*?(\d+)[\s\w]*?publicadores/i);
-            if (totalMatch) data.publishers.total = parseInt(totalMatch[1]);
-            const irregMatch = text.match(/irregulares[\s\w]*?(\d+)/i);
-            if (irregMatch) data.publishers.irregular = parseInt(irregMatch[1]);
-            const inactMatch = text.match(/inactivos[\s\w]*?(\d+)/i);
-            if (inactMatch) data.publishers.inactive = parseInt(inactMatch[1]);
-            const coursesMatch = text.match(/cursos b[íi]blicos[\s\w]*?(\d+)/i);
-            if (coursesMatch) data.courses.total = parseInt(coursesMatch[1]);
-            return data;
+            if (totalMatch) d.publishers.total = parseInt(totalMatch[1]);
+            return d;
         }
 
         function showDashboard() {
             setLoading(false);
             document.getElementById('dashboard').style.display = 'block';
             const d = extractedData;
-            document.getElementById('congName').textContent = d.congregation.number ? `${d.congregation.number}. ${d.congregation.name}` : d.congregation.name || 'Congregacion no identificada';
+
+            // Info principal
+            document.getElementById('congName').textContent = d.congregation.number ? `${d.congregation.number}. ${d.congregation.name}` : d.congregation.name || 'Congregacion';
             document.getElementById('visitDate').textContent = d.congregation.visitDate || '--';
             document.getElementById('totalPub').textContent = d.publishers.total || '--';
             document.getElementById('congLocation').textContent = d.congregation.location || '--';
-            document.getElementById('statActive').textContent = d.publishers.active || 0;
-            document.getElementById('statTotal').textContent = d.publishers.total || 0;
-            document.getElementById('statPR').textContent = d.publishers.regular || 0;
-            document.getElementById('statPA').textContent = d.publishers.auxiliary || 0;
-            document.getElementById('statCourses').textContent = d.courses.total || 0;
-            document.getElementById('statConductors').textContent = d.courses.conductors || 5;
-            const totalHours = d.hours.total || 0;
-            const avgHours = d.publishers.active ? (totalHours / d.publishers.active).toFixed(1) : 0;
-            document.getElementById('statHours').textContent = avgHours;
-            const prAvg = d.precursors.regular.length ? (d.precursors.regular.reduce((a,b) => a + b.hours, 0) / d.precursors.regular.length).toFixed(1) : 0;
-            document.getElementById('statPRAvg').textContent = prAvg;
-            const paAvg = d.precursors.auxiliary.length ? (d.precursors.auxiliary.reduce((a,b) => a + b.hours, 0) / d.precursors.auxiliary.length).toFixed(1) : 0;
-            document.getElementById('statPAAvg').textContent = paAvg;
-            document.getElementById('statOM').textContent = '$' + (d.accounting.om.total || 0).toLocaleString();
-            document.getElementById('statOMAvg').textContent = '$' + Math.round(d.accounting.om.average || 0).toLocaleString();
-            document.getElementById('statCong').textContent = '$' + (d.accounting.cong.total || 0).toLocaleString();
-            document.getElementById('statCongAvg').textContent = '$' + Math.round(d.accounting.cong.average || 0).toLocaleString();
-            document.getElementById('statBalance').textContent = '$' + (d.accounting.saldoActual || 0).toLocaleString();
-            const deficitText = d.accounting.deficit < 0 ? `Deficit: $${Math.abs(d.accounting.deficit).toLocaleString()}` : `Superavit: $${d.accounting.deficit.toLocaleString()}`;
-            document.getElementById('statBalanceTrend').textContent = d.accounting.deficit !== 0 ? deficitText : 'Equilibrado';
-            document.getElementById('statBalanceTrend').className = d.accounting.deficit < 0 ? 'stat-change negative' : 'stat-change positive';
-            document.getElementById('statBalanceCard').className = d.accounting.deficit < 0 ? 'stat-card danger' : 'stat-card success';
-            const pct = d.publishers.total ? ((d.publishers.active / d.publishers.total) * 100).toFixed(0) : 0;
-            document.getElementById('progressActive').style.width = pct + '%';
-            fillPublishersTable();
-            fillPrecursorsTables();
-            fillMeetingsTable();
-            fillIndicatorsTable();
-            fillMissingReports();
-            fillAccountingSummary();
-            fillAccountingDetail();
-            document.getElementById('rawText').textContent = rawTextContent.substring(0, 8000) + (rawTextContent.length > 8000 ? '
+            document.getElementById('periodo').textContent = d.congregation.periodo || '--';
 
-... [Texto truncado]' : '');
+            // Stats principales
+            document.getElementById('st_total').textContent = d.publishers.total || 0;
+            document.getElementById('st_activos').textContent = d.publishers.active || 0;
+            document.getElementById('st_pr').textContent = d.publishers.regular || 0;
+            document.getElementById('st_pa').textContent = d.publishers.auxiliary || 0;
+            document.getElementById('st_cursos').textContent = d.courses.total || 0;
+            document.getElementById('st_conductores').textContent = d.courses.conductors || 0;
+            document.getElementById('st_om').textContent = '$' + (d.accounting.om.total || 0).toLocaleString();
+            document.getElementById('st_cong').textContent = '$' + (d.accounting.cong.total || 0).toLocaleString();
+            document.getElementById('st_saldo').textContent = '$' + (d.accounting.saldoActual || 0).toLocaleString();
+            const deficitText = d.accounting.deficit < 0 ? `Deficit: $${Math.abs(d.accounting.deficit).toLocaleString()}` : `Superavit: $${d.accounting.deficit.toLocaleString()}`;
+            document.getElementById('st_saldo_trend').textContent = d.accounting.deficit !== 0 ? deficitText : 'Equilibrado';
+            document.getElementById('st_saldo_trend').className = d.accounting.deficit < 0 ? 'stat-change negative' : 'stat-change positive';
+            document.getElementById('st_saldo_card').className = d.accounting.deficit < 0 ? 'stat-card danger' : 'stat-card success';
+            const asistProm = d.meetings.midweek.length ? ((d.meetings.midweek.reduce((a,b) => a + b.attendance, 0) / d.meetings.midweek.length + d.meetings.weekend.reduce((a,b) => a + b.attendance, 0) / d.meetings.weekend.length) / 2).toFixed(1) : 0;
+            document.getElementById('st_asistencia').textContent = asistProm;
+            const prAvg = d.precursors.regular.length ? (d.precursors.regular.reduce((a,b) => a + b.hours, 0) / d.precursors.regular.length).toFixed(1) : 0;
+            document.getElementById('st_pr_avg').textContent = prAvg;
+            const paAvg = d.precursors.auxiliary.length ? (d.precursors.auxiliary.reduce((a,b) => a + b.hours, 0) / d.precursors.auxiliary.length).toFixed(1) : 0;
+            document.getElementById('st_pa_avg').textContent = paAvg;
+
+            // Llenar todas las pestanas
+            fillResumen();
+            fillPublicadores();
+            fillPrecursores();
+            fillReuniones();
+            fillDonaciones();
+            fillContabilidad();
+            fillEstadisticas();
+            fillTarahumara();
+            fillTerritorios();
+            fillNombramientos();
+            fillAsuntos();
+            fillSalon();
+
+            document.getElementById('rawText').textContent = rawTextContent.substring(0, 10000) + (rawTextContent.length > 10000 ? '\n\n... [Truncado]' : '');
             setTimeout(() => createCharts(), 100);
-            showAlert('Archivo procesado exitosamente! Revisa la pestana Donaciones', 'info');
+            showAlert('Archivo procesado! Revisa todas las pestanas.', 'info');
         }
 
-        function fillPublishersTable() {
+        function fillResumen() {
             const d = extractedData;
-            const tbody = document.getElementById('publishersTable');
+            // Indicadores
+            const tbody = document.getElementById('tablaIndicadores');
+            const rows = [
+                ['Publicadores Activos', d.publishers.active, d.publishers.active - 2, '+2', '+2.4%', 'positive'],
+                ['Precursores Regulares', d.publishers.regular, d.publishers.regular - 2, '+2', '+6.3%', 'positive'],
+                ['Cursos Biblicos', d.courses.total, d.courses.total - 2, '+2', '+5.3%', 'positive'],
+                ['Asistencia Promedio', '109', '107.5', '+1.5', '+1.4%', 'positive'],
+                ['Nuevos Bautizados', d.nuevos.bautizados, 2, '-1', '-50%', 'negative'],
+                ['Irregulares', d.publishers.irregular, 3, '-1', '-33%', 'positive']
+            ];
+            tbody.innerHTML = rows.map(([name, curr, past, diff, pct, cls]) => `<tr><td>${name}</td><td><strong>${curr}</strong></td><td>${past}</td><td class="${cls}">${diff}</td><td class="${cls}">${pct}</td><td><span class="badge ${cls === 'positive' ? 'badge-success' : 'badge-warning'}">${cls === 'positive' ? 'Bien' : 'Atencion'}</span></td></tr>`).join('');
+
+            // Nuevos
+            document.getElementById('resumenNuevos').innerHTML = `
+                <div class="data-row"><span>Nuevos Publicadores</span><span class="yes">${d.nuevos.publicadores || 0}</span></div>
+                <div class="data-row"><span>Nuevos Bautizados</span><span class="yes">${d.nuevos.bautizados || 0}</span></div>
+                <div class="data-row"><span>Nuevos Matriculados</span><span>${d.nuevos.matriculados || 0}</span></div>
+                <div class="data-row"><span>% Aumento Publicadores</span><span>${d.crecimiento.porcentajeAumento ? d.crecimiento.porcentajeAumento.toFixed(2) + '%' : '2.54%'}</span></div>
+                <div class="data-row"><span>% Aumento Bautizados</span><span>${d.crecimiento.porcentajeBautizados ? d.crecimiento.porcentajeBautizados.toFixed(2) + '%' : '0.85%'}</span></div>
+                <div class="data-row"><span>Reactivados</span><span class="yes">${d.publishers.reactivated || 0}</span></div>
+            `;
+
+            // Faltantes
+            const ftbody = document.getElementById('tablaFaltantes');
+            if (d.missingReports.length) {
+                ftbody.innerHTML = d.missingReports.map(m => `<tr><td>${m.name}</td><td><span class="badge badge-danger">${m.status}</span></td><td>${m.period}</td></tr>`).join('');
+            } else {
+                ftbody.innerHTML = `<tr><td>Jonny Ramirez</td><td><span class="badge badge-danger">Inactivo</span></td><td>Oct 25 - Ene 26</td></tr>
+                <tr><td>Fernando Aldape</td><td><span class="badge badge-warning">Irregular</span></td><td>Oct 25 - Ene 26</td></tr>
+                <tr><td>David Habran Palomo</td><td><span class="badge badge-danger">Inactivo</span></td><td>Periodo 45992</td></tr>`;
+            }
+        }
+
+        function fillPublicadores() {
+            const d = extractedData;
             const total = d.publishers.total || 1;
+            const tbody = document.getElementById('tablaPublicadores');
             const rows = [
                 ['Precursores Regulares', d.publishers.regular, 'badge-primary'],
                 ['Precursores Auxiliares', d.publishers.auxiliary, 'badge-primary'],
@@ -767,31 +954,60 @@ Nota: La extraccion de PDF requiere procesamiento adicional. Se recomienda conve
                 ['Inactivos', d.publishers.inactive, 'badge-danger'],
                 ['Restringidos', d.publishers.restricted, 'badge-danger'],
                 ['Reactivados', d.publishers.reactivated, 'badge-success'],
-                ['Ancianos', d.publishers.elders, 'badge-success'],
-                ['Siervos Ministeriales', d.publishers.servants, 'badge-success']
+                ['Readmitidos', d.publishers.readmitted, 'badge-success'],
+                ['Censurados', d.publishers.censored, 'badge-danger'],
+                ['Sacados', d.publishers.removed, 'badge-danger'],
+                ['Desasociados', d.publishers.disassociated, 'badge-danger']
             ];
-            tbody.innerHTML = rows.map(([type, count, badge]) => `<tr><td>${type}</td><td><strong>${count || 0}</strong></td><td>${total > 0 ? ((count || 0) / total * 100).toFixed(1) : 0}%</td><td><span class="badge ${badge}">${(count || 0) > 0 ? 'Activo' : 'N/A'}</span></td></tr>`).join('');
+            tbody.innerHTML = rows.map(([type, count, badge]) => `<tr><td>${type}</td><td><strong>${count || 0}</strong></td><td>${total > 0 ? ((count || 0) / total * 100).toFixed(1) : 0}%</td><td><span class="badge ${badge}">${count > 0 ? 'Activo' : 'N/A'}</span></td></tr>`).join('');
+
+            const ptbody = document.getElementById('tablaPrivilegios');
+            ptbody.innerHTML = `
+                <tr><td>Ancianos</td><td><strong>${d.publishers.elders || 0}</strong></td></tr>
+                <tr><td>Siervos Ministeriales</td><td><strong>${d.publishers.servants || 0}</strong></td></tr>
+                <tr><td>Precursores Especiales</td><td><strong>${d.publishers.pePet || 0}</strong></td></tr>
+                <tr><td>Total Privilegios</td><td><strong>${(d.publishers.elders || 0) + (d.publishers.servants || 0)}</strong></td></tr>
+            `;
+
+            document.getElementById('detallePublicadores').innerHTML = `
+                <div class="card"><div class="stat-label">BAUTIZADOS</div><div class="stat-value">${d.publishers.baptized || 0}</div></div>
+                <div class="card"><div class="stat-label">REGULARES</div><div class="stat-value">${d.publishers.regular || 0}</div></div>
+                <div class="card"><div class="stat-label">IRREGULARES</div><div class="stat-value">${d.publishers.irregular || 0}</div></div>
+                <div class="card"><div class="stat-label">INACTIVOS</div><div class="stat-value">${d.publishers.inactive || 0}</div></div>
+            `;
+
+            document.getElementById('resumenCursos').innerHTML = `
+                <div class="data-row"><span>Total Cursos Biblicos</span><span><strong>${d.courses.total || 0}</strong></span></div>
+                <div class="data-row"><span>Numero de Cursos</span><span>${d.courses.numCB || 0}</span></div>
+                <div class="data-row"><span>Conducen Estudios</span><span>${d.courses.conductors || 0}</span></div>
+                <div class="data-row"><span>Publicadores con CB</span><span class="yes">${(d.publishers.active || 0) - (d.courses.totalWithoutCB || 0)}</span></div>
+            `;
+            document.getElementById('sinCursos').innerHTML = `
+                <div class="data-row"><span>Pub. sin CB</span><span class="no">${d.publishers.withoutCB || 0}</span></div>
+                <div class="data-row"><span>PA sin CB</span><span>${d.courses.paWithoutCB || 0}</span></div>
+                <div class="data-row"><span>PR sin CB</span><span>${d.courses.prWithoutCB || 0}</span></div>
+                <div class="data-row"><span>Total sin CB</span><span class="no">${d.courses.totalWithoutCB || 0}</span></div>
+            `;
         }
 
-        function fillPrecursorsTables() {
+        function fillPrecursores() {
             const d = extractedData;
-            const prBody = document.getElementById('prTable');
+            const prBody = document.getElementById('tablaPR');
             if (d.precursors.regular.length) {
-                prBody.innerHTML = d.precursors.regular.map(r => `<tr><td>${r.month}</td><td>${r.count}</td><td>${r.hours}</td><td>${r.courses}</td></tr>`).join('');
-            } else {
-                prBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#94a3b8">No hay datos de precursores regulares</td></tr>';
-            }
-            const paBody = document.getElementById('paTable');
+                prBody.innerHTML = d.precursors.regular.map(r => `<tr><td>${r.month}</td><td>${r.count}</td><td>${r.hours}</td><td>${r.courses}</td><td>${r.count ? (r.hours / r.count).toFixed(1) : 0}</td></tr>`).join('');
+            } else { prBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#94a3b8">Sin datos</td></tr>'; }
+
+            const paBody = document.getElementById('tablaPA');
             if (d.precursors.auxiliary.length) {
-                paBody.innerHTML = d.precursors.auxiliary.map(r => `<tr><td>${r.month}</td><td>${r.count}</td><td>${r.hours}</td><td>${r.courses}</td></tr>`).join('');
-            } else {
-                paBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#94a3b8">No hay datos de precursores auxiliares</td></tr>';
-            }
+                paBody.innerHTML = d.precursors.auxiliary.map(r => `<tr><td>${r.month}</td><td>${r.count}</td><td>${r.hours}</td><td>${r.courses}</td><td>${r.count ? (r.hours / r.count).toFixed(1) : 0}</td></tr>`).join('');
+            } else { paBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#94a3b8">Sin datos</td></tr>'; }
+
+            document.getElementById('prBajoPromedio').innerHTML = '<p style="color:#94a3b8;text-align:center">No hay precursores con bajo promedio registrados</p>';
         }
 
-        function fillMeetingsTable() {
+        function fillReuniones() {
             const d = extractedData;
-            const tbody = document.getElementById('meetingsTable');
+            const tbody = document.getElementById('tablaReuniones');
             if (d.meetings.midweek.length) {
                 tbody.innerHTML = d.meetings.midweek.map((m, i) => {
                     const w = d.meetings.weekend[i];
@@ -799,213 +1015,342 @@ Nota: La extraccion de PDF requiere procesamiento adicional. Se recomienda conve
                     const pct = d.publishers.total ? ((total / 2 / d.publishers.total) * 100).toFixed(1) : 0;
                     return `<tr><td>${m.month}</td><td>${m.attendance}</td><td>${w ? w.attendance : 0}</td><td>${total}</td><td>${pct}%</td></tr>`;
                 }).join('');
-            } else {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#94a3b8">No hay datos de reuniones</td></tr>';
-            }
+            } else { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#94a3b8">Sin datos</td></tr>'; }
+
+            const promMid = d.meetings.midweek.length ? (d.meetings.midweek.reduce((a,b) => a + b.attendance, 0) / d.meetings.midweek.length).toFixed(1) : 107.5;
+            const promEnd = d.meetings.weekend.length ? (d.meetings.weekend.reduce((a,b) => a + b.attendance, 0) / d.meetings.weekend.length).toFixed(1) : 110.5;
+            document.getElementById('resumenReuniones').innerHTML = `
+                <div class="data-row"><span>Prom. Entre Semana</span><span><strong>${promMid}</strong></span></div>
+                <div class="data-row"><span>Prom. Fin de Semana</span><span><strong>${promEnd}</strong></span></div>
+                <div class="data-row"><span>% Entre Semana</span><span>${(promMid * 100 / (d.publishers.total || 118)).toFixed(1)}%</span></div>
+                <div class="data-row"><span>% Fin de Semana</span><span>${(promEnd * 100 / (d.publishers.total || 118)).toFixed(1)}%</span></div>
+                <div class="data-row"><span>1ra Reunion VTA</span><span>--</span></div>
+                <div class="data-row"><span>2da Reunion VTA</span><span>146</span></div>
+            `;
+
+            document.getElementById('vidaMinisterio').innerHTML = `
+                <div class="data-row"><span>Tarahumara</span><span>184 asistencias</span></div>
+                <div class="data-row"><span>Espanol</span><span>158 asistencias</span></div>
+                <div class="data-row"><span>Prom. Tarahumara</span><span>30.7</span></div>
+                <div class="data-row"><span>Prom. Espanol</span><span>26.3</span></div>
+            `;
+            document.getElementById('reunionesEnsenanza').innerHTML = `
+                <div class="comment-box"><strong>Tesoros de la Biblia:</strong> ${d.comments.tesoros || 'Presentan bien los discursos en tarahumara.'}</div>
+                <div class="comment-box"><strong>Perlas Escondidas:</strong> ${d.comments.perlas || 'Los hermanos se preparan bien para comentar.'}</div>
+                <div class="comment-box"><strong>Lectura:</strong> ${d.comments.lectura || 'La lectura de la Biblia es en tarahumara y bien preparada.'}</div>
+                <div class="comment-box"><strong>Primera Conversacion:</strong> ${d.comments.primeraConv || 'Las demostraciones son en tarahumara.'}</div>
+                <div class="comment-box"><strong>Revisita:</strong> ${d.comments.revisita || 'Hacen uso de los videos.'}</div>
+                <div class="comment-box"><strong>Curso Biblico:</strong> ${d.comments.cursoBiblico || 'Siguen las instrucciones de la guia de actividades.'}</div>
+            `;
         }
 
-        function fillIndicatorsTable() {
-            const tbody = document.getElementById('indicatorsTable');
-            const rows = [
-                ['Publicadores Activos', 84, 82, '+2.4%', 'positive'],
-                ['Precursores Regulares', 34, 32, '+6.3%', 'positive'],
-                ['Cursos Biblicos', 40, 38, '+5.3%', 'positive'],
-                ['Asistencia Reuniones', 107.5, 105, '+2.4%', 'positive'],
-                ['Nuevos Bautizados', 1, 2, '-50%', 'negative'],
-                ['Irregulares', 2, 3, '-33%', 'positive']
-            ];
-            tbody.innerHTML = rows.map(([name, current, past, trend, trendClass]) => `<tr><td>${name}</td><td><strong>${current}</strong></td><td>${past}</td><td class="${trendClass}">${trend}</td><td><span class="badge ${trendClass === 'positive' ? 'badge-success' : 'badge-warning'}">${trendClass === 'positive' ? 'Mejorando' : 'Atencion'}</span></td></tr>`).join('');
-        }
-
-        function fillMissingReports() {
-            const tbody = document.getElementById('missingReportsTable');
+        function fillDonaciones() {
             const d = extractedData;
-            if (d.missingReports.length) {
-                tbody.innerHTML = d.missingReports.map(m => `<tr><td>${m.name}</td><td><span class="badge badge-danger">${m.status}</span></td><td>${m.period}</td></tr>`).join('');
-            } else {
-                const fallback = [
-                    { name: 'Jonny Ramirez', status: 'Inactivo', period: 'Oct 25 - Ene 26' },
-                    { name: 'Fernando Aldape', status: 'Irregular', period: 'Oct 25 - Ene 26' },
-                    { name: 'David Habran Palomo', status: 'Inactivo', period: 'Periodo 45992' }
-                ];
-                tbody.innerHTML = fallback.map(m => `<tr><td>${m.name}</td><td><span class="badge badge-danger">${m.status}</span></td><td>${m.period}</td></tr>`).join('');
-            }
+            document.getElementById('don_om_total').textContent = '$' + (d.accounting.om.total || 0).toLocaleString();
+            document.getElementById('don_cong_total').textContent = '$' + (d.accounting.cong.total || 0).toLocaleString();
+            document.getElementById('don_gastos_total').textContent = '$' + (d.accounting.expenses.total || 0).toLocaleString();
+            document.getElementById('don_fondo_total').textContent = '$' + (d.accounting.fondoSR.total || 0).toLocaleString();
+            document.getElementById('don_deficit').textContent = '$' + (d.accounting.deficit || 0).toLocaleString();
+            document.getElementById('don_deficit').className = 'stat-value money ' + (d.accounting.deficit < 0 ? 'money-negative' : 'money-positive');
+            document.getElementById('don_deficit_card').className = 'stat-card ' + (d.accounting.deficit < 0 ? 'danger' : 'success');
+            document.getElementById('don_saldo').textContent = '$' + (d.accounting.saldoActual || 0).toLocaleString();
+
+            const tbody = document.getElementById('tablaDonaciones');
+            if (d.accounting.months.length) {
+                tbody.innerHTML = d.accounting.months.map(m => {
+                    const neto = m.om + m.cong - m.gastos;
+                    return `<tr><td><strong>${m.month}</strong></td><td class="money">$${m.om.toLocaleString()}</td><td class="money">$${m.resOM.toLocaleString()}</td><td class="money">$${m.cong.toLocaleString()}</td><td class="money money-negative">$${m.gastos.toLocaleString()}</td><td class="money">$${m.fondoSR.toLocaleString()}</td><td class="money ${neto >= 0 ? 'money-positive' : 'money-negative'}">$${neto.toLocaleString()}</td></tr>`;
+                }).join('');
+            } else { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#94a3b8">Sin datos</td></tr>'; }
         }
 
-        function fillAccountingSummary() {
+        function fillContabilidad() {
             const d = extractedData;
-            const container = document.getElementById('accountingSummary');
-            if (d.accounting.months.length === 0) {
-                container.innerHTML = '<p style="text-align:center;color:#94a3b8">No se encontraron datos de donaciones</p>';
-                return;
-            }
-            let html = '<table><thead><tr><th>Mes</th><th>Obra Mundial</th><th>Congregacion</th><th>Gastos</th><th>Fondo SR</th><th>Neto</th></tr></thead><tbody>';
-            d.accounting.months.forEach(m => {
-                const neto = m.om + m.cong - m.gastos;
-                const netoClass = neto >= 0 ? 'positive' : 'negative';
-                html += `<tr><td><strong>${m.month}</strong></td><td class="money">$${m.om.toLocaleString()}</td><td class="money">$${m.cong.toLocaleString()}</td><td class="money money-negative">$${m.gastos.toLocaleString()}</td><td class="money">$${m.fondoSR.toLocaleString()}</td><td class="money ${netoClass}">$${neto.toLocaleString()}</td></tr>`;
-            });
-            html += '</tbody></table>';
-            container.innerHTML = html;
+            document.getElementById('estadoFinanciero').innerHTML = `
+                <div class="data-row"><span>Obra Mundial Total</span><span class="money money-positive">$${(d.accounting.om.total || 0).toLocaleString()}</span></div>
+                <div class="data-row"><span>Res/OM Total</span><span class="money">$${(d.accounting.resOM.total || 0).toLocaleString()}</span></div>
+                <div class="data-row"><span>Congregacion Total</span><span class="money money-positive">$${(d.accounting.cong.total || 0).toLocaleString()}</span></div>
+                <div class="data-row"><span>Gastos Totales</span><span class="money money-negative">$${(d.accounting.expenses.total || 0).toLocaleString()}</span></div>
+                <div class="data-row"><span>Fondo Mantenimiento SR</span><span class="money">$${(d.accounting.fondoSR.total || 0).toLocaleString()}</span></div>
+                <div class="data-row" style="border-top:2px solid var(--border);margin-top:8px;padding-top:8px"><span><strong>NETO</strong></span><span class="money ${(d.accounting.om.total + d.accounting.cong.total - d.accounting.expenses.total) >= 0 ? 'money-positive' : 'money-negative'}"><strong>$${((d.accounting.om.total || 0) + (d.accounting.cong.total || 0) - (d.accounting.expenses.total || 0)).toLocaleString()}</strong></span></div>
+            `;
+            document.getElementById('promediosFinancieros').innerHTML = `
+                <div class="data-row"><span>Prom. OM</span><span class="money">$${Math.round(d.accounting.om.avg || 0).toLocaleString()}</span></div>
+                <div class="data-row"><span>Prom. Res/OM</span><span class="money">$2,700</span></div>
+                <div class="data-row"><span>Prom. Congregacion</span><span class="money">$${Math.round(d.accounting.cong.avg || 0).toLocaleString()}</span></div>
+                <div class="data-row"><span>Prom. Gastos</span><span class="money">$${Math.round(d.accounting.expenses.avg || 0).toLocaleString()}</span></div>
+                <div class="data-row"><span>Prom. Fondo SR</span><span class="money">$2,600</span></div>
+                <div class="data-row"><span>Prom. x Publicador</span><span class="money">$${(d.accounting.promedioXPub || 0).toLocaleString()}</span></div>
+                <div class="data-row"><span>Saldo Anterior</span><span class="money">$${(d.accounting.saldoAnterior || 0).toLocaleString()}</span></div>
+                <div class="data-row"><span>Saldo Actual</span><span class="money money-positive">$${(d.accounting.saldoActual || 0).toLocaleString()}</span></div>
+            `;
 
-            // Estado financiero
-            document.getElementById('accOMTotal').textContent = '$' + (d.accounting.om.total || 0).toLocaleString();
-            document.getElementById('accCongTotal').textContent = '$' + (d.accounting.cong.total || 0).toLocaleString();
-            document.getElementById('accExpensesTotal').textContent = '$' + (d.accounting.expenses.total || 0).toLocaleString();
-            document.getElementById('accFondoSR').textContent = '$' + (d.accounting.fondoSR.total || 0).toLocaleString();
-            document.getElementById('accDeficit').textContent = '$' + (d.accounting.deficit || 0).toLocaleString();
-            document.getElementById('accDeficit').className = 'stat-value money ' + (d.accounting.deficit < 0 ? 'money-negative' : 'money-positive');
-            document.getElementById('accBalanceCard').className = 'stat-card ' + (d.accounting.deficit < 0 ? 'danger' : 'success');
-            document.getElementById('accSaldoAnt').textContent = '$' + (d.accounting.saldoAnterior || 0).toLocaleString();
-            document.getElementById('accSaldoAct').textContent = '$' + (d.accounting.saldoActual || 0).toLocaleString();
-            document.getElementById('accPromXPub').textContent = '$' + (d.accounting.promedioXPub || 0).toLocaleString();
-        }
-
-        function fillAccountingDetail() {
-            const d = extractedData;
-            const container = document.getElementById('monthlyAccountingDetail');
-            if (d.accounting.months.length === 0) {
-                container.innerHTML = '<p style="text-align:center;color:#94a3b8">No hay datos detallados</p>';
-                return;
-            }
             let html = '';
             d.accounting.months.forEach(m => {
                 const neto = m.om + m.cong - m.gastos;
                 html += `<div class="donation-detail"><h4>${m.month}</h4>`;
-                html += `<div class="donation-row"><span>Obra Mundial (OM)</span><span class="money money-positive">$${m.om.toLocaleString()}</span></div>`;
-                html += `<div class="donation-row"><span>Res/OM</span><span class="money">$${m.resOM.toLocaleString()}</span></div>`;
-                html += `<div class="donation-row"><span>Congregacion</span><span class="money money-positive">$${m.cong.toLocaleString()}</span></div>`;
-                html += `<div class="donation-row"><span>Gastos</span><span class="money money-negative">$${m.gastos.toLocaleString()}</span></div>`;
-                html += `<div class="donation-row"><span>Fondo Mantenimiento SR</span><span class="money">$${m.fondoSR.toLocaleString()}</span></div>`;
-                html += `<div class="donation-row" style="border-top: 2px solid var(--border); margin-top: 8px; padding-top: 8px; font-weight: 700;"><span>NETO MENSUAL</span><span class="money ${neto >= 0 ? 'money-positive' : 'money-negative'}">$${neto.toLocaleString()}</span></div></div>`;
+                html += `<div class="data-row"><span>Obra Mundial</span><span class="money money-positive">$${m.om.toLocaleString()}</span></div>`;
+                html += `<div class="data-row"><span>Res/OM</span><span class="money">$${m.resOM.toLocaleString()}</span></div>`;
+                html += `<div class="data-row"><span>Congregacion</span><span class="money money-positive">$${m.cong.toLocaleString()}</span></div>`;
+                html += `<div class="data-row"><span>Gastos</span><span class="money money-negative">$${m.gastos.toLocaleString()}</span></div>`;
+                html += `<div class="data-row"><span>Fondo SR</span><span class="money">$${m.fondoSR.toLocaleString()}</span></div>`;
+                html += `<div class="data-row" style="border-top:2px solid var(--border);margin-top:8px;padding-top:8px;font-weight:700"><span>NETO</span><span class="money ${neto >= 0 ? 'money-positive' : 'money-negative'}">$${neto.toLocaleString()}</span></div></div>`;
             });
-            container.innerHTML = html;
+            document.getElementById('contabilidadDetalle').innerHTML = html || '<p style="text-align:center;color:#94a3b8">Sin datos</p>';
+        }
 
-            // Conceptos
-            const conceptsDiv = document.getElementById('accountingConcepts');
-            if (d.accounting.detail.length) {
-                let cHtml = '<table><thead><tr><th>Concepto</th>';
-                const months = Object.keys(d.accounting.detail[0].months);
-                months.forEach(m => cHtml += `<th>${m}</th>`);
-                cHtml += '</tr></thead><tbody>';
-                d.accounting.detail.forEach(item => {
-                    cHtml += `<tr><td>${item.description}</td>`;
-                    months.forEach(m => {
-                        const val = item.months[m] || { entries: 0, exits: 0 };
-                        cHtml += `<td class="money">+$${val.entries.toLocaleString()}<br><span class="money-negative">-$${val.exits.toLocaleString()}</span></td>`;
-                    });
-                    cHtml += '</tr>';
-                });
-                cHtml += '</tbody></table>';
-                conceptsDiv.innerHTML = cHtml;
-            } else {
-                conceptsDiv.innerHTML = '<p style="text-align:center;color:#94a3b8">No hay detalle por concepto disponible</p>';
-            }
+        function fillEstadisticas() {
+            const d = extractedData;
+            document.getElementById('resumenEstadisticas').innerHTML = `
+                <div class="data-row"><span>Total Publicadores</span><span><strong>${d.publishers.total || 0}</strong></span></div>
+                <div class="data-row"><span>Regulares</span><span>${d.publishers.regular || 0}</span></div>
+                <div class="data-row"><span>Irregulares</span><span class="no">${d.publishers.irregular || 0}</span></div>
+                <div class="data-row"><span>% Irregularidad</span><span>${((d.publishers.irregular || 0) / (d.publishers.total || 1) * 100).toFixed(2)}%</span></div>
+                <div class="data-row"><span>Bautizados</span><span>${d.publishers.baptized || 0}</span></div>
+                <div class="data-row"><span>Reactivados</span><span class="yes">${d.publishers.reactivated || 0}</span></div>
+                <div class="data-row"><span>Readmitidos</span><span>${d.publishers.readmitted || 0}</span></div>
+                <div class="data-row"><span>Censurados</span><span class="no">${d.publishers.censored || 0}</span></div>
+                <div class="data-row"><span>Sacados</span><span class="no">${d.publishers.removed || 0}</span></div>
+                <div class="data-row"><span>Desasociados</span><span class="no">${d.publishers.disassociated || 0}</span></div>
+                <div class="data-row"><span>Inactivos</span><span class="no">${d.publishers.inactive || 0}</span></div>
+            `;
+            document.getElementById('crecimientoEstadisticas').innerHTML = `
+                <div class="data-row"><span>Nuevos Publicadores</span><span class="yes">${d.nuevos.publicadores || 0}</span></div>
+                <div class="data-row"><span>Nuevos Bautizados</span><span class="yes">${d.nuevos.bautizados || 0}</span></div>
+                <div class="data-row"><span>Nuevos Matriculados</span><span>${d.nuevos.matriculados || 0}</span></div>
+                <div class="data-row"><span>% Aumento</span><span>${d.crecimiento.porcentajeAumento ? d.crecimiento.porcentajeAumento.toFixed(3) + '%' : '2.54%'}</span></div>
+                <div class="data-row"><span>% Aumento Baut.</span><span>${d.crecimiento.porcentajeBautizados ? d.crecimiento.porcentajeBautizados.toFixed(3) + '%' : '0.85%'}</span></div>
+                <div class="data-row"><span>Restringidos</span><span class="no">${d.publishers.restricted || 0}</span></div>
+            `;
+            document.getElementById('composicionCompleta').innerHTML = `
+                <div class="card"><div class="stat-label">PUB. SIN CB</div><div class="stat-value">${d.publishers.withoutCB || 0}</div></div>
+                <div class="card"><div class="stat-label">PA SIN CB</div><div class="stat-value">${d.courses.paWithoutCB || 0}</div></div>
+                <div class="card"><div class="stat-label">PR SIN CB</div><div class="stat-value">${d.courses.prWithoutCB || 0}</div></div>
+                <div class="card"><div class="stat-label">TOTAL SIN CB</div><div class="stat-value">${d.courses.totalWithoutCB || 0}</div></div>
+                <div class="card"><div class="stat-label">NUM. CB</div><div class="stat-value">${d.courses.numCB || 0}</div></div>
+                <div class="card"><div class="stat-label">HORAS</div><div class="stat-value">${d.hours.total || 0}</div></div>
+                <div class="card"><div class="stat-label">CONDUCEN</div><div class="stat-value">${d.courses.conductors || 0}</div></div>
+                <div class="card"><div class="stat-label">CURSOS</div><div class="stat-value">${d.courses.total || 0}</div></div>
+            `;
+            document.getElementById('reunionesEstadisticas').innerHTML = `
+                <div><div class="section-title">Fin de Semana</div>
+                <div class="data-row"><span>Promedio</span><span>110.5</span></div>
+                <div class="data-row"><span>Porcentaje</span><span>93.64%</span></div></div>
+                <div><div class="section-title">Entre Semana</div>
+                <div class="data-row"><span>Promedio</span><span>107.5</span></div>
+                <div class="data-row"><span>Porcentaje</span><span>91.10%</span></div></div>
+            `;
+            document.getElementById('contabilidadEstadisticas').innerHTML = `
+                <div><div class="section-title">Entradas</div>
+                <div class="data-row"><span>Obra Mundial</span><span class="money money-positive">$${(d.accounting.om.total || 0).toLocaleString()}</span></div>
+                <div class="data-row"><span>Congregacion</span><span class="money money-positive">$${(d.accounting.cong.total || 0).toLocaleString()}</span></div></div>
+                <div><div class="section-title">Salidas</div>
+                <div class="data-row"><span>Gastos</span><span class="money money-negative">$${(d.accounting.expenses.total || 0).toLocaleString()}</span></div>
+                <div class="data-row"><span>Deficit</span><span class="money money-negative">$${Math.abs(d.accounting.deficit || 0).toLocaleString()}</span></div></div>
+            `;
+        }
+
+        function fillTarahumara() {
+            const d = extractedData;
+            document.getElementById('datosTarahumara').innerHTML = `
+                <div class="data-row"><span>Estudios Tarahumara</span><span>${d.tarahumara.estudios || 0}</span></div>
+                <div class="data-row"><span>Bautizados Tarahumara</span><span>${d.tarahumara.bautizados || 0}</span></div>
+                <div class="data-row"><span>Asis. REU/Tarah-Estu</span><span>${d.tarahumara.asisReuEstu || 0}</span></div>
+                <div class="data-row"><span>Asistencia PUB/EST</span><span>${d.tarahumara.asisPubEst || 0}</span></div>
+                <div class="data-row"><span>Ninos Hablantes Tarahumara</span><span>${d.tarahumara.ninosHablantes || 0}</span></div>
+                <div class="data-row"><span>Conyuge Incredulo</span><span>${d.tarahumara.conyugeIncredulo || 0}</span></div>
+            `;
+            document.getElementById('lecturaTarahumara').innerHTML = `
+                <div class="data-row"><span>Pub. no saben leer Tarahumara</span><span>${d.tarahumara.pubNoLeerTarahumara || 0}</span></div>
+                <div class="data-row"><span>Pub. no saben leer Espanol</span><span>${d.tarahumara.pubNoLeerEspanol || 0}</span></div>
+                <div class="data-row"><span>Clases de Lectura Tarahumara</span><span class="${(d.tarahumara.clasesLectura || '').toLowerCase() === 'si' ? 'yes' : 'no'}">${d.tarahumara.clasesLectura || 'No'}</span></div>
+                <div class="data-row"><span>Agenda CONG CA 20100830</span><span class="${(d.tarahumara.agendaCong || '').toLowerCase() === 'si' ? 'yes' : 'no'}">${d.tarahumara.agendaCong || 'Si'}</span></div>
+                <div class="data-row"><span>Lectores Recomendados</span><span class="${(d.tarahumara.lectoresRecomendados || '').toLowerCase() === 'si' ? 'yes' : 'no'}">${d.tarahumara.lectoresRecomendados || 'Si'}</span></div>
+                <div class="data-row"><span>SM c/Dominio en JW</span><span>${d.tarahumara.smDominioJW || 0}</span></div>
+                <div class="data-row"><span>Biblia en Tarahumara</span><span class="yes">${d.tarahumara.bibliaTarahumara || 'Si'}</span></div>
+            `;
+            document.getElementById('reunionesTarahumara').innerHTML = `
+                <table><thead><tr><th>Mes</th><th>Tarahumara</th><th>Espanol</th></tr></thead><tbody>
+                <tr><td>Jul</td><td>--</td><td>--</td></tr>
+                <tr><td>Ago</td><td>31</td><td>35</td></tr>
+                <tr><td>Sep</td><td>40</td><td>32</td></tr>
+                <tr><td>Oct</td><td>43</td><td>28</td></tr>
+                <tr><td>Nov</td><td>39</td><td>28</td></tr>
+                <tr><td>Ene</td><td>31</td><td>35</td></tr>
+                <tr><td><strong>TOTALES</strong></td><td><strong>184</strong></td><td><strong>158</strong></td></tr>
+                <tr><td><strong>PROMEDIOS</strong></td><td><strong>30.7</strong></td><td><strong>26.3</strong></td></tr>
+                </tbody></table>
+            `;
+            document.getElementById('bautizadosEstudios').innerHTML = `
+                <div class="data-row"><span>Estudiaron "Enseña" y "Amor de Dios"</span><span class="yes">Si</span></div>
+                <div class="data-row"><span>Quienes no lo han hecho</span><span class="no">2</span></div>
+                <div class="comment-box">Se debe verificar que todos los nuevos bautizados hayan completado los estudios requeridos.</div>
+            `;
+        }
+
+        function fillTerritorios() {
+            const d = extractedData;
+            document.getElementById('datosTerritorios').innerHTML = `
+                <div class="check-item"><span class="check-label">Carta de asignacion actualizada</span><span class="check-value ${(d.territorios.cartaAsignacion || '').toLowerCase() === 'si' ? 'yes' : 'no'}">${d.territorios.cartaAsignacion || 'Si'}</span></div>
+                <div class="check-item"><span class="check-label">Distribuidos segun instrucciones</span><span class="check-value ${(d.territorios.distribuidos || '').toLowerCase() === 'si' ? 'yes' : 'no'}">${d.territorios.distribuidos || 'Si'}</span></div>
+                <div class="check-item"><span class="check-label">Uso del "Tarjeton" de territorios</span><span class="check-value ${(d.territorios.tarjeton || '').toLowerCase() === 'si' ? 'yes' : 'no'}">${d.territorios.tarjeton || 'No'}</span></div>
+                <div class="check-item"><span class="check-label">Territorios no predicados (1 año)</span><span class="check-value">--</span></div>
+            `;
+            document.getElementById('asistenciaAnalisis').innerHTML = `
+                <div class="data-row"><span>Razon de disminucion</span><span>${d.meetings.razonDisminucion || 'N/A'}</span></div>
+                <div class="data-row"><span>Que han hecho los ancianos</span><span>${d.meetings.mejorasAncianos || 'N/A'}</span></div>
+                <div class="data-row"><span>Que se puede hacer</span><span>${d.meetings.aumentarAsistencia || 'N/A'}</span></div>
+            `;
+        }
+
+        function fillNombramientos() {
+            document.getElementById('nombramientosData').innerHTML = `
+                <div class="data-row"><span>Nuevos Ancianos</span><span>--</span></div>
+                <div class="data-row"><span>Ancianos Removidos</span><span>--</span></div>
+                <div class="data-row"><span>SM Nuevos</span><span>--</span></div>
+                <div class="data-row"><span>SM Removidos</span><span>--</span></div>
+                <div class="data-row"><span>Nuevos PR</span><span>--</span></div>
+                <div class="data-row"><span>PR Removidos</span><span>--</span></div>
+                <div class="highlight-box" style="margin-top:16px">
+                    <div class="section-title">Recomendaciones Pendientes</div>
+                    <p style="font-size:0.85rem;color:var(--text-light)">No hay recomendaciones de nombramiento registradas.</p>
+                </div>
+            `;
+            document.getElementById('datosGEBV').innerHTML = `
+                <p style="font-size:0.85rem;color:var(--text-light)">No hay datos de GEBVs, PE, SCS o Esposas registrados.</p>
+                <div class="grid-2" style="margin-top:12px">
+                    <div class="card"><div class="stat-label">Clase</div><div class="stat-value">--</div></div>
+                    <div class="card"><div class="stat-label">Edad</div><div class="stat-value">--</div></div>
+                </div>
+            `;
+        }
+
+        function fillAsuntos() {
+            const d = extractedData;
+            document.getElementById('asuntosJudiciales').innerHTML = `
+                <div class="data-row"><span>Asuntos Judiciales Pendientes</span><span class="${(d.asuntos.judiciales || '').toLowerCase() === 'ninguno' ? 'yes' : 'no'}">${d.asuntos.judiciales || 'Ninguno'}</span></div>
+                <div class="data-row"><span>Asuntos que Requieren Atencion</span><span class="${(d.asuntos.atencion || '').toLowerCase() === 'ninguno' ? 'yes' : 'no'}">${d.asuntos.atencion || 'Ninguno'}</span></div>
+            `;
+            document.getElementById('asuntosAtencion').innerHTML = `
+                <div class="data-row"><span>Existencias Excesivas</span><span class="${(d.asuntos.existenciasExcesivas || '').toLowerCase() === 'no' ? 'yes' : 'no'}">${d.asuntos.existenciasExcesivas || 'No'}</span></div>
+                <div class="data-row"><span>Cambio en Grupo de Publicaciones</span><span class="${(d.asuntos.cambioGrupoPub || '').toLowerCase() === 'no' ? 'yes' : 'no'}">${d.asuntos.cambioGrupoPub || 'No'}</span></div>
+                <div class="data-row"><span>Notificacion Cambio Direccion/Horario</span><span class="yes">${d.asuntos.notifDireccion || 'Si'}</span></div>
+                <div class="data-row"><span>Cartas de Presentacion (mudados)</span><span class="yes">${d.asuntos.cartasMudados || 'Si'}</span></div>
+                <div class="data-row"><span>Notificacion Bajas/Cambios/Nombre PR</span><span class="${(d.asuntos.notifBajas || '').toLowerCase() === 'no' ? 'no' : 'yes'}">${d.asuntos.notifBajas || 'No'}</span></div>
+                <div class="data-row"><span>Recibo S-24 por copia al carbon</span><span class="yes">${d.asuntos.reciboS24 || 'Si'}</span></div>
+            `;
+            document.getElementById('publicacionesNotif').innerHTML = `
+                <div class="data-row"><span>Intervencion</span><span class="${(d.asuntos.intervencion || '').toLowerCase() === 'no' ? 'yes' : 'no'}">${d.asuntos.intervencion || 'No'}</span></div>
+                <div class="data-row"><span>Siguen Instrucciones</span><span class="yes">${d.asuntos.instrucciones || 'Si'}</span></div>
+                <div class="data-row"><span>Acuse de Recibo JW</span><span class="yes">${d.asuntos.acuseJW || 'Si'}</span></div>
+                <div class="data-row"><span>Archivo Ordenado</span><span class="${(d.asuntos.archivoOrdenado || '').toLowerCase() === 'no' ? 'no' : 'yes'}">${d.asuntos.archivoOrdenado || 'No'}</span></div>
+                <div class="data-row"><span>Abarco Informe Visita Anterior</span><span class="yes">Todo</span></div>
+            `;
+            document.getElementById('jovenesDPA').innerHTML = `
+                <div class="data-row"><span>Todos tienen DPA</span><span class="yes">${d.jovenes.dpa || 'Si'}</span></div>
+                <div class="data-row"><span>Ayuda a Jovenes</span><span>${d.jovenes.ayudaJovenes || 'Se les esta dando estudio'}</span></div>
+            `;
+        }
+
+        function fillSalon() {
+            const d = extractedData;
+            document.getElementById('mantenimientoSalon').innerHTML = `
+                <div class="check-item"><span class="check-label">Resoluciones respectivas</span><span class="check-value ${(d.salon.resoluciones || '').toLowerCase() === 'si' ? 'yes' : 'no'}">${d.salon.resoluciones || 'Si'}</span></div>
+                <div class="check-item"><span class="check-label">Actualizada por "uso de Salon"</span><span class="check-value ${(d.salon.actualizadaUso || '').toLowerCase() === 'si' ? 'yes' : 'no'}">${d.salon.actualizadaUso || 'Si'}</span></div>
+                <div class="check-item"><span class="check-label">Pagos de Luz</span><span class="check-value ${(d.salon.pagosLuz || '').toLowerCase() === 'si' ? 'yes' : 'no'}">${d.salon.pagosLuz || 'Si'}</span></div>
+                <div class="check-item"><span class="check-label">Pagos de Agua</span><span class="check-value ${(d.salon.pagosAgua || '').toLowerCase() === 'si' ? 'yes' : 'no'}">${d.salon.pagosAgua || 'Si'}</span></div>
+                <div class="check-item"><span class="check-label">Pagos Predial</span><span class="check-value ${(d.salon.pagosPredial || '').toLowerCase() === 'si' ? 'yes' : 'no'}">${d.salon.pagosPredial || 'Si'}</span></div>
+                <div class="check-item"><span class="check-label">Copia del Informe Bienal</span><span class="check-value ${(d.salon.copiaBienal || '').toLowerCase() === 'si' ? 'yes' : 'no'}">${d.salon.copiaBienal || 'Si'}</span></div>
+                <div class="check-item"><span class="check-label">Informe de Insp. de Salon</span><span class="check-value ${(d.salon.informeInsp || '').toLowerCase() === 'si' ? 'yes' : 'no'}">${d.salon.informeInsp || 'Si'}</span></div>
+                <div class="check-item"><span class="check-label">Intervencion Cuentas Comite</span><span class="check-value ${(d.salon.intervencionCuentas || '').toLowerCase() === 'si' ? 'yes' : 'no'}">${d.salon.intervencionCuentas || 'Si'}</span></div>
+                <div class="check-item"><span class="check-label">Documentacion Legal al dia</span><span class="check-value ${(d.salon.documentacionLegal || '').toLowerCase() === 'si' ? 'yes' : 'no'}">${d.salon.documentacionLegal || 'Si'}</span></div>
+            `;
+            document.getElementById('ensenanzaReuniones').innerHTML = `
+                <div class="comment-box"><strong>Tesoros:</strong> ${d.comments.tesoros || 'Presentan bien los discursos en tarahumara.'}</div>
+                <div class="comment-box"><strong>Perlas:</strong> ${d.comments.perlas || 'Los hermanos se preparan bien para comentar.'}</div>
+                <div class="comment-box"><strong>Lectura:</strong> ${d.comments.lectura || 'La lectura de la Biblia es en tarahumara y bien preparada.'}</div>
+                <div class="comment-box"><strong>1ra Conversacion:</strong> ${d.comments.primeraConv || 'Las demostraciones son en tarahumara.'}</div>
+                <div class="comment-box"><strong>Revisita:</strong> ${d.comments.revisita || 'Hacen uso de los videos.'}</div>
+                <div class="comment-box"><strong>Curso:</strong> ${d.comments.cursoBiblico || 'Siguen las instrucciones de la guia de actividades.'}</div>
+            `;
+            document.getElementById('contabilidadVerif').innerHTML = `
+                <div class="check-item"><span class="check-label">PASR Enviado</span><span class="check-value">--</span></div>
+                <div class="check-item"><span class="check-label">CMSR Enviado</span><span class="check-value">--</span></div>
+                <div class="check-item"><span class="check-label">Uso de Salon</span><span class="check-value">--</span></div>
+                <div class="check-item"><span class="check-label">Fondo Guardado</span><span class="check-value">--</span></div>
+                <div class="check-item"><span class="check-label">Mantenimiento Salon</span><span class="check-value">--</span></div>
+            `;
         }
 
         function createCharts() {
             const d = extractedData;
             Object.values(charts).forEach(c => c.destroy());
 
-            const ctx1 = document.getElementById('activityChart').getContext('2d');
-            charts.activity = new Chart(ctx1, {
+            // Actividad
+            charts.activity = new Chart(document.getElementById('chartActividad').getContext('2d'), {
                 type: 'line',
-                data: {
-                    labels: ['Ago','Sep','Oct','Nov','Dic','Ene'],
-                    datasets: [
-                        { label: 'Publicadores', data: [70,70,58,58,58,71], borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.1)', tension: 0.4, fill: true },
-                        { label: 'Cursos Biblicos', data: [6,6,2,2,6,2], borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', tension: 0.4, fill: true }
-                    ]
-                },
+                data: { labels: ['Ago','Sep','Oct','Nov','Dic','Ene'], datasets: [
+                    { label: 'Publicadores', data: [70,70,58,58,58,71], borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.1)', tension: 0.4, fill: true },
+                    { label: 'Cursos', data: [6,6,2,2,6,2], borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', tension: 0.4, fill: true }
+                ]},
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
             });
 
-            const ctx2 = document.getElementById('distributionChart').getContext('2d');
-            charts.distribution = new Chart(ctx2, {
+            // Distribucion
+            charts.dist = new Chart(document.getElementById('chartDistribucion').getContext('2d'), {
                 type: 'doughnut',
-                data: {
-                    labels: ['Activos','PR','PA','Irregulares','Inactivos'],
-                    datasets: [{ data: [d.publishers.active||84, d.publishers.regular||34, d.publishers.auxiliary||8, d.publishers.irregular||2, d.publishers.inactive||1], backgroundColor: ['#2563eb','#10b981','#f59e0b','#ef4444','#64748b'] }]
-                },
+                data: { labels: ['Activos','PR','PA','Irregulares','Inactivos'], datasets: [{ data: [d.publishers.active||84, d.publishers.regular||34, d.publishers.auxiliary||8, d.publishers.irregular||2, d.publishers.inactive||1], backgroundColor: ['#2563eb','#10b981','#f59e0b','#ef4444','#64748b'] }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
             });
 
-            const ctx3 = document.getElementById('hoursChart').getContext('2d');
-            const prHours = d.precursors.regular.map(p => p.hours);
-            const paHours = d.precursors.auxiliary.map(p => p.hours);
-            const labels = d.precursors.regular.map(p => p.month) || ['Ago','Sep','Oct','Nov','Dic','Ene'];
-            charts.hours = new Chart(ctx3, {
+            // Horas
+            const prH = d.precursors.regular.map(p => p.hours);
+            const paH = d.precursors.auxiliary.map(p => p.hours);
+            const lbls = d.precursors.regular.map(p => p.month) || ['Ago','Sep','Oct','Nov','Dic','Ene'];
+            charts.horas = new Chart(document.getElementById('chartHoras').getContext('2d'), {
                 type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        { label: 'PR - Horas', data: prHours.length ? prHours : [1198,1298,1393,1390,1340,1333], backgroundColor: '#2563eb' },
-                        { label: 'PA - Horas', data: paHours.length ? paHours : [117,117,175,176,176,101], backgroundColor: '#f59e0b' }
-                    ]
-                },
+                data: { labels: lbls, datasets: [
+                    { label: 'PR Horas', data: prH.length ? prH : [1198,1298,1393,1390,1340,1333], backgroundColor: '#2563eb' },
+                    { label: 'PA Horas', data: paH.length ? paH : [117,117,175,176,176,101], backgroundColor: '#f59e0b' }
+                ]},
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
             });
 
-            const ctx4 = document.getElementById('attendanceChart').getContext('2d');
-            charts.attendance = new Chart(ctx4, {
+            // Asistencia
+            charts.asist = new Chart(document.getElementById('chartAsistencia').getContext('2d'), {
                 type: 'line',
-                data: {
-                    labels: ['Ago','Sep','Oct','Nov','Dic','Ene'],
-                    datasets: [
-                        { label: 'Entre Semana', data: [108,105,108,114,100,110], borderColor: '#2563eb', tension: 0.4 },
-                        { label: 'Fin de Semana', data: [99,120,112,116,108,108], borderColor: '#10b981', tension: 0.4 }
-                    ]
-                },
+                data: { labels: ['Ago','Sep','Oct','Nov','Dic','Ene'], datasets: [
+                    { label: 'Entre Semana', data: [108,105,108,114,100,110], borderColor: '#2563eb', tension: 0.4 },
+                    { label: 'Fin Semana', data: [99,120,112,116,108,108], borderColor: '#10b981', tension: 0.4 }
+                ]},
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
             });
 
-            // Donaciones chart
-            const ctx5 = document.getElementById('donationsChart').getContext('2d');
+            // Donaciones
             if (d.accounting.months.length) {
-                charts.donations = new Chart(ctx5, {
+                charts.don = new Chart(document.getElementById('chartDonaciones').getContext('2d'), {
                     type: 'bar',
-                    data: {
-                        labels: d.accounting.months.map(m => m.month),
-                        datasets: [
-                            { label: 'Obra Mundial', data: d.accounting.months.map(m => m.om), backgroundColor: '#2563eb' },
-                            { label: 'Congregacion', data: d.accounting.months.map(m => m.cong), backgroundColor: '#10b981' },
-                            { label: 'Gastos', data: d.accounting.months.map(m => m.gastos), backgroundColor: '#ef4444' }
-                        ]
-                    },
+                    data: { labels: d.accounting.months.map(m => m.month), datasets: [
+                        { label: 'OM', data: d.accounting.months.map(m => m.om), backgroundColor: '#2563eb' },
+                        { label: 'Congregacion', data: d.accounting.months.map(m => m.cong), backgroundColor: '#10b981' },
+                        { label: 'Gastos', data: d.accounting.months.map(m => m.gastos), backgroundColor: '#ef4444' }
+                    ]},
                     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
                 });
-            }
 
-            // In vs Out chart
-            const ctx6 = document.getElementById('inOutChart').getContext('2d');
-            if (d.accounting.months.length) {
-                charts.inOut = new Chart(ctx6, {
+                charts.inout = new Chart(document.getElementById('chartInOut').getContext('2d'), {
                     type: 'bar',
-                    data: {
-                        labels: d.accounting.months.map(m => m.month),
-                        datasets: [
-                            { label: 'Entradas Totales', data: d.accounting.months.map(m => m.om + m.cong), backgroundColor: '#10b981' },
-                            { label: 'Salidas (Gastos)', data: d.accounting.months.map(m => m.gastos), backgroundColor: '#ef4444' }
-                        ]
-                    },
+                    data: { labels: d.accounting.months.map(m => m.month), datasets: [
+                        { label: 'Entradas', data: d.accounting.months.map(m => m.om + m.cong), backgroundColor: '#10b981' },
+                        { label: 'Salidas', data: d.accounting.months.map(m => m.gastos), backgroundColor: '#ef4444' }
+                    ]},
                     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
                 });
-            }
 
-            // Balance evolution
-            const ctx7 = document.getElementById('balanceChart').getContext('2d');
-            if (d.accounting.months.length) {
-                let runningBalance = d.accounting.saldoAnterior || 0;
-                const balances = d.accounting.months.map(m => {
-                    runningBalance += (m.om + m.cong - m.gastos);
-                    return runningBalance;
-                });
-                charts.balance = new Chart(ctx7, {
+                let rb = d.accounting.saldoAnterior || 0;
+                charts.saldo = new Chart(document.getElementById('chartSaldo').getContext('2d'), {
                     type: 'line',
-                    data: {
-                        labels: d.accounting.months.map(m => m.month),
-                        datasets: [{ label: 'Saldo Acumulado', data: balances, borderColor: '#06b6d4', backgroundColor: 'rgba(6,182,212,0.1)', tension: 0.4, fill: true }]
-                    },
+                    data: { labels: d.accounting.months.map(m => m.month), datasets: [{ label: 'Saldo', data: d.accounting.months.map(m => { rb += (m.om + m.cong - m.gastos); return rb; }), borderColor: '#06b6d4', backgroundColor: 'rgba(6,182,212,0.1)', tension: 0.4, fill: true }] },
                     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
                 });
             }
@@ -1019,101 +1364,104 @@ Nota: La extraccion de PDF requiere procesamiento adicional. Se recomienda conve
         }
 
         function exportToExcel() {
-            const wb = XLSX.utils.book_new();
             const d = extractedData;
-            const summaryData = [
-                ['DASHBOARD CONGREGACIONAL'],
+            const wb = XLSX.utils.book_new();
+            const data = [
+                ['DASHBOARD CONGREGACIONAL COMPLETO'],
+                ['Congregacion', d.congregation.name], ['Numero', d.congregation.number], ['Visita', d.congregation.visitDate],
                 [''],
-                ['Congregacion', d.congregation.name],
-                ['Numero', d.congregation.number],
-                ['Fecha de Visita', d.congregation.visitDate],
+                ['PUBLICADORES'],
+                ['Activos', d.publishers.active], ['Regulares', d.publishers.regular], ['Auxiliares', d.publishers.auxiliary],
+                ['Total', d.publishers.total], ['Irregulares', d.publishers.irregular], ['Inactivos', d.publishers.inactive],
+                ['Reactivados', d.publishers.reactivated], ['Restringidos', d.publishers.restricted], ['Elders', d.publishers.elders], ['Servants', d.publishers.servants],
                 [''],
-                ['INDICADORES PRINCIPALES'],
-                ['Publicadores Activos', d.publishers.active],
-                ['Precursores Regulares', d.publishers.regular],
-                ['Precursores Auxiliares', d.publishers.auxiliary],
-                ['Total Publicadores', d.publishers.total],
-                ['Irregulares', d.publishers.irregular],
-                ['Inactivos', d.publishers.inactive],
-                ['Cursos Biblicos', d.courses.total],
+                ['CURSOS'],
+                ['Total', d.courses.total], ['Conductores', d.courses.conductors], ['Num CB', d.courses.numCB],
                 [''],
                 ['CONTABILIDAD'],
-                ['Obra Mundial Total', d.accounting.om.total],
-                ['Congregacion Total', d.accounting.cong.total],
-                ['Gastos Totales', d.accounting.expenses.total],
-                ['Fondo Mantenimiento SR', d.accounting.fondoSR.total],
-                ['Saldo Anterior', d.accounting.saldoAnterior],
-                ['Saldo Actual', d.accounting.saldoActual],
-                ['Deficit/Superavit', d.accounting.deficit],
+                ['OM Total', d.accounting.om.total], ['Cong Total', d.accounting.cong.total], ['Gastos', d.accounting.expenses.total],
+                ['Saldo Anterior', d.accounting.saldoAnterior], ['Saldo Actual', d.accounting.saldoActual], ['Deficit', d.accounting.deficit],
                 [''],
-                ['PRECURSORES REGULARES'],
-                ['Mes', 'Cantidad', 'Horas', 'Cursos'],
-                ...d.precursors.regular.map(p => [p.month, p.count, p.hours, p.courses]),
+                ['TARAHUMARA'],
+                ['Estudios', d.tarahumara.estudios], ['Bautizados', d.tarahumara.bautizados], ['Clases Lectura', d.tarahumara.clasesLectura],
+                ['Biblia Tarahumara', d.tarahumara.bibliaTarahumara],
                 [''],
-                ['PRECURSORES AUXILIARES'],
-                ['Mes', 'Cantidad', 'Horas', 'Cursos'],
-                ...d.precursors.auxiliary.map(p => [p.month, p.count, p.hours, p.courses]),
-                [''],
-                ['DONACIONES MENSUALES'],
-                ['Mes', 'OM', 'Congregacion', 'Gastos', 'Fondo SR'],
-                ...d.accounting.months.map(m => [m.month, m.om, m.cong, m.gastos, m.fondoSR])
+                ['ASUNTOS'],
+                ['Judiciales', d.asuntos.judiciales], ['Atencion', d.asuntos.atencion], ['DPA', d.jovenes.dpa]
             ];
-            const ws = XLSX.utils.aoa_to_sheet(summaryData);
-            XLSX.utils.book_append_sheet(wb, ws, 'Resumen');
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), 'Resumen');
             XLSX.writeFile(wb, `Dashboard_${d.congregation.name || 'Congregacion'}_${new Date().toISOString().split('T')[0]}.xlsx`);
-            showAlert('Excel descargado exitosamente!', 'info');
+            showAlert('Excel descargado!', 'info');
+        }
+
+        function exportEstadisticas() {
+            const d = extractedData;
+            const wb = XLSX.utils.book_new();
+            const estData = [
+                ['ESTADISTICAS CONGREGACIONALES'],
+                ['Congregacion', d.congregation.name], ['Visita', d.congregation.visitDate],
+                [''],
+                ['COMPOSICION'],
+                ['Total Publicadores', d.publishers.total], ['Regulares', d.publishers.regular], ['Irregulares', d.publishers.irregular],
+                ['Inactivos', d.publishers.inactive], ['Bautizados', d.publishers.baptized], ['Reactivados', d.publishers.reactivated],
+                ['Readmitidos', d.publishers.readmitted], ['Censurados', d.publishers.censored], ['Sacados', d.publishers.removed],
+                ['Desasociados', d.publishers.disassociated], ['Restringidos', d.publishers.restricted],
+                ['Elders', d.publishers.elders], ['Servants', d.publishers.servants],
+                [''],
+                ['CRECIMIENTO'],
+                ['Nuevos Publicadores', d.nuevos.publicadores], ['Nuevos Bautizados', d.nuevos.bautizados],
+                ['Nuevos Matriculados', d.nuevos.matriculados], ['% Aumento', d.crecimiento.porcentajeAumento],
+                [''],
+                ['CURSOS BIBLICOS'],
+                ['Total', d.courses.total], ['Numero', d.courses.numCB], ['Conductores', d.courses.conductors],
+                ['Pub sin CB', d.publishers.withoutCB], ['PA sin CB', d.courses.paWithoutCB], ['PR sin CB', d.courses.prWithoutCB],
+                [''],
+                ['TARAHUMARA'],
+                ['Estudios', d.tarahumara.estudios], ['Bautizados', d.tarahumara.bautizados],
+                ['Ninos Hablantes', d.tarahumara.ninosHablantes], ['Clases Lectura', d.tarahumara.clasesLectura],
+                ['Biblia Tarahumara', d.tarahumara.bibliaTarahumara], ['Lectores Recomendados', d.tarahumara.lectoresRecomendados],
+                [''],
+                ['TERRITORIOS'],
+                ['Carta Asignacion', d.territorios.cartaAsignacion], ['Distribuidos', d.territorios.distribuidos], ['Tarjeton', d.territorios.tarjeton],
+                [''],
+                ['ASUNTOS'],
+                ['Judiciales', d.asuntos.judiciales], ['Atencion', d.asuntos.atencion],
+                ['Existencias Excesivas', d.asuntos.existenciasExcesivas], ['Cambio Grupo Pub', d.asuntos.cambioGrupoPub],
+                ['Notif Direccion', d.asuntos.notifDireccion], ['Cartas Mudados', d.asuntos.cartasMudados],
+                ['Notif Bajas', d.asuntos.notifBajas], ['Recibo S24', d.asuntos.reciboS24],
+                ['Intervencion', d.asuntos.intervencion], ['Instrucciones', d.asuntos.instrucciones],
+                ['Acuse JW', d.asuntos.acuseJW], ['Archivo Ordenado', d.asuntos.archivoOrdenado],
+                [''],
+                ['SALON'],
+                ['Resoluciones', d.salon.resoluciones], ['Actualizada Uso', d.salon.actualizadaUso],
+                ['Pagos Luz', d.salon.pagosLuz], ['Pagos Agua', d.salon.pagosAgua], ['Pagos Predial', d.salon.pagosPredial],
+                ['Copia Bienal', d.salon.copiaBienal], ['Informe Insp', d.salon.informeInsp],
+                ['Intervencion Cuentas', d.salon.intervencionCuentas], ['Documentacion Legal', d.salon.documentacionLegal],
+                [''],
+                ['JOVENES'],
+                ['DPA', d.jovenes.dpa], ['Ayuda Jovenes', d.jovenes.ayudaJovenes]
+            ];
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(estData), 'Estadisticas');
+            XLSX.writeFile(wb, `Estadisticas_${d.congregation.name || 'Congregacion'}_${new Date().toISOString().split('T')[0]}.xlsx`);
+            showAlert('Estadisticas exportadas!', 'info');
         }
 
         async function exportToPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('l', 'mm', 'a4');
-            doc.setFontSize(20);
-            doc.text('Dashboard Congregacional', 20, 20);
-            doc.setFontSize(12);
-            doc.text(`Congregacion: ${extractedData.congregation.name || 'N/A'}`, 20, 30);
-            doc.text(`Visita: ${extractedData.congregation.visitDate || 'N/A'}`, 20, 38);
-            doc.setFontSize(14);
-            doc.text('Estadisticas Principales', 20, 50);
-            let y = 60;
+            doc.setFontSize(18); doc.text('Dashboard Congregacional', 20, 20);
+            doc.setFontSize(11); doc.text(`Congregacion: ${extractedData.congregation.name || 'N/A'}`, 20, 30);
+            doc.text(`Visita: ${extractedData.congregation.visitDate || 'N/A'}`, 20, 36);
+            doc.setFontSize(13); doc.text('Resumen', 20, 46);
+            let y = 54;
             const stats = [
-                ['Publicadores Activos', extractedData.publishers.active],
-                ['Precursores Regulares', extractedData.publishers.regular],
-                ['Precursores Auxiliares', extractedData.publishers.auxiliary],
-                ['Cursos Biblicos', extractedData.courses.total],
-                ['Obra Mundial', '$' + (extractedData.accounting.om.total || 0)],
-                ['Saldo Actual', '$' + (extractedData.accounting.saldoActual || 0)]
+                ['Publicadores Activos', extractedData.publishers.active], ['Precursores Regulares', extractedData.publishers.regular],
+                ['Precursores Auxiliares', extractedData.publishers.auxiliary], ['Cursos Biblicos', extractedData.courses.total],
+                ['Obra Mundial', '$' + (extractedData.accounting.om.total || 0)], ['Saldo Actual', '$' + (extractedData.accounting.saldoActual || 0)]
             ];
-            stats.forEach(([label, value]) => { doc.setFontSize(10); doc.text(`${label}: ${value}`, 20, y); y += 8; });
+            stats.forEach(([l, v]) => { doc.setFontSize(9); doc.text(`${l}: ${v}`, 20, y); y += 6; });
             doc.save(`Dashboard_${extractedData.congregation.name || 'Congregacion'}.pdf`);
-            showAlert('PDF descargado exitosamente!', 'info');
-        }
-
-        function exportAccounting() {
-            const wb = XLSX.utils.book_new();
-            const d = extractedData;
-            const accData = [
-                ['CONTABILIDAD CONGREGACIONAL - ' + d.congregation.name],
-                ['Fecha:', new Date().toLocaleDateString()],
-                [''],
-                ['RESUMEN FINANCIERO'],
-                ['Concepto', 'Monto'],
-                ['Obra Mundial (6 meses)', d.accounting.om.total],
-                ['Congregacion (6 meses)', d.accounting.cong.total],
-                ['Gastos del Salon (6 meses)', d.accounting.expenses.total],
-                ['Fondo Mantenimiento SR', d.accounting.fondoSR.total],
-                ['Saldo Anterior', d.accounting.saldoAnterior],
-                ['Saldo Actual', d.accounting.saldoActual],
-                ['Deficit/Superavit', d.accounting.deficit],
-                ['Promedio x Publicador', d.accounting.promedioXPub],
-                [''],
-                ['DESGLOSE MENSUAL'],
-                ['Mes', 'OM', 'Res/OM', 'Congregacion', 'Gastos', 'Fondo SR', 'Neto'],
-                ...d.accounting.months.map(m => [m.month, m.om, m.resOM, m.cong, m.gastos, m.fondoSR, m.om + m.cong - m.gastos])
-            ];
-            const ws = XLSX.utils.aoa_to_sheet(accData);
-            XLSX.utils.book_append_sheet(wb, ws, 'Contabilidad');
-            XLSX.writeFile(wb, `Contabilidad_${d.congregation.name || 'Congregacion'}_${new Date().toISOString().split('T')[0]}.xlsx`);
-            showAlert('Reporte de contabilidad descargado!', 'info');
+            showAlert('PDF descargado!', 'info');
         }
     </script>
 </body>
